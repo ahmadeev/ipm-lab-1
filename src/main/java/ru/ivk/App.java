@@ -7,24 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class App {
-    public static Vec3 localToGlobal(Vec3 A, Vec3 B, Vec3 C, double u, double v) {
-        return A.add(
-                    B.subtract(A).normalize().multiply(u)
-                ).add(
-                    C.subtract(A).normalize().multiply(v)
-                );
-    }
-
-    public static double computeBRDF(Vec3 N, Vec3 s, Vec3 V, double kd, double ks, double ke) {
-        double diffuse = kd * Math.max(0, N.dot(s));
-
-        Vec3 h = s.add(V).normalize();
-
-        double specular = ks * Math.pow(Math.max(0, N.dot(h)), ke);
-
-        return diffuse + specular;
-    }
-
     public static void main( String[] args ) {
         // ---- Треугольник ----
         Vec3 A = new Vec3(0, 0, 0); // P_0
@@ -35,13 +17,13 @@ public class App {
         List<Light> lights = new ArrayList<>();
 
         lights.add(new Light(
-                new Vec3(1, 0, 2), // расположение
+                new Vec3(5, -5, 2), // расположение
                 new Vec3(-0.333333333333333, 0.666666666666666, -0.666666666666666), // направление
-                new Vec3(500, 500, 0) // I_0
+                new Vec3(1500, 1500, 0) // I_0
         ));
 
         lights.add(new Light(
-                new Vec3(0, 2, 2), // расположение
+                new Vec3(0, 2, 15), // расположение
                 new Vec3(0, 0, 1), // направление
                 new Vec3(1000, 1000, 1000) // I_0
         ));
@@ -57,22 +39,10 @@ public class App {
         Vec3 K = new Vec3(1, 0, 0); // цвет поверхности
 
         // ---- Локальные точки ----
-        double[][] localPoints = {
-                {-100, -100},
-                {0, 0},
-                {0, 15},
-                {0, 2},
-                {100, 100}
-        };
+        Double[] localXs = new Double[]{-100.0, 0.0, 2.0, 5.0, 10.0};
+        Double[] localYs = {-100.0, 0.0, 2.0, 15.0, 100.0};
 
-        // ---- Глобальные точки ----
-        double[][] globalPoints = {
-                {-100, -37.1391, -92.8477},
-                {0, 0, 0},
-                {0, 5.5709, 13.9272},
-                {0, 0.7428, 1.8570},
-                {100, 37.1391, 92.8477}
-        };
+        Double[][] localPoints = generateSeries(localXs, localYs);
 
         compute(
                 localPoints,
@@ -83,6 +53,15 @@ public class App {
                 K, kd, ks, ke
         );
 
+/*        // ---- Глобальные точки ----
+        double[][] globalPoints = {
+                {-100, -37.1391, -92.8477},
+                {0, 0, 0},
+                {0, 5.5709, 13.9272},
+                {0, 0.7428, 1.8570},
+                {100, 37.1391, 92.8477}
+        };
+
         compute(
                 globalPoints,
                 false,
@@ -90,11 +69,11 @@ public class App {
                 A, B, C,
                 observer,
                 K, kd, ks, ke
-        );
+        );*/
     }
 
     private static void compute(
-            double[][] points,
+            Double[][] points,
             boolean isLocal,
             List<Light> lights,
             Vec3 A,
@@ -109,7 +88,7 @@ public class App {
         // ---- Нормаль ----
         Vec3 N = C.subtract(A).cross(B.subtract(A)).normalize();
 
-        for (double[] lp : points) {
+        for (Double[] lp : points) {
             double u = lp[0];
             double v = lp[1];
 
@@ -118,6 +97,7 @@ public class App {
             Vec3 V = P.subtract(observer).normalize();
 
             Vec3 totalBrightness = new Vec3(0,0,0);
+            Vec3 totalE = new Vec3(0, 0, 0);
 
             for (Light light : lights) {
                 Vec3 s = P.subtract(light.position);
@@ -130,6 +110,7 @@ public class App {
                 Vec3 I = light.intensity.multiply(cosTheta);
 
                 Vec3 E = I.multiply(cosAlpha / (R * R));
+                totalE = totalE.add(E);
 
                 double brdf = computeBRDF(N, s, V, kd, ks, ke);
 
@@ -151,8 +132,39 @@ public class App {
             }
 
             System.out.printf("Глобальные координаты: %s%n", P);
+            System.out.printf("Освещенность: %s%n", totalE);
             System.out.printf("Яркость RGB: %s%n", totalBrightness);
             System.out.println("---------------------------------");
         }
+    }
+
+    public static Vec3 localToGlobal(Vec3 A, Vec3 B, Vec3 C, double u, double v) {
+        return A.add(
+                B.subtract(A).normalize().multiply(u)
+        ).add(
+                C.subtract(A).normalize().multiply(v)
+        );
+    }
+
+    public static double computeBRDF(Vec3 N, Vec3 s, Vec3 V, double kd, double ks, double ke) {
+        double diffuse = kd * Math.max(0, N.dot(s));
+
+        Vec3 h = s.add(V).normalize();
+
+        double specular = ks * Math.pow(Math.max(0, N.dot(h)), ke);
+
+        return diffuse + specular;
+    }
+
+    private static Double[][] generateSeries(Double[] xs, Double[] ys) {
+        List<Double[]> result = new ArrayList<>();
+
+        for (double x : xs) {
+            for (double y : ys) {
+                result.add(new Double[]{x, y});
+            }
+        }
+
+        return result.toArray(new Double[0][2]);
     }
 }
