@@ -29,10 +29,7 @@ public class App {
         // ---- Треугольник ----
         Vec3 A = new Vec3(0, 0, 0); // P_0
         Vec3 B = new Vec3(2, 0, 0); // P_1
-        Vec3 C = new Vec3(0, 2, 0); // P_2
-
-        // ---- Нормаль ----
-        Vec3 N = C.subtract(A).cross(B.subtract(A)).normalize();
+        Vec3 C = new Vec3(0, 2, 5); // P_2
 
         // ---- Источники света ----
         List<Light> lights = new ArrayList<>();
@@ -41,6 +38,12 @@ public class App {
                 new Vec3(1, 0, 2), // расположение
                 new Vec3(-0.333333333333333, 0.666666666666666, -0.666666666666666), // направление
                 new Vec3(500, 500, 0) // I_0
+        ));
+
+        lights.add(new Light(
+                new Vec3(0, 2, 2), // расположение
+                new Vec3(0, 0, 1), // направление
+                new Vec3(1000, 1000, 1000) // I_0
         ));
 
         // ---- Наблюдатель ----
@@ -55,15 +58,62 @@ public class App {
 
         // ---- Локальные точки ----
         double[][] localPoints = {
-                {1, 0},
-                {0, 1}
+                {-100, -100},
+                {0, 0},
+                {0, 15},
+                {0, 2},
+                {100, 100}
         };
 
-        for (double[] lp : localPoints) {
+        // ---- Глобальные точки ----
+        double[][] globalPoints = {
+                {-100, -37.1391, -92.8477},
+                {0, 0, 0},
+                {0, 5.5709, 13.9272},
+                {0, 0.7428, 1.8570},
+                {100, 37.1391, 92.8477}
+        };
+
+        compute(
+                localPoints,
+                true,
+                lights,
+                A, B, C,
+                observer,
+                K, kd, ks, ke
+        );
+
+        compute(
+                globalPoints,
+                false,
+                lights,
+                A, B, C,
+                observer,
+                K, kd, ks, ke
+        );
+    }
+
+    private static void compute(
+            double[][] points,
+            boolean isLocal,
+            List<Light> lights,
+            Vec3 A,
+            Vec3 B,
+            Vec3 C,
+            Vec3 observer,
+            Vec3 K,
+            double kd,
+            double ks,
+            double ke
+    ) {
+        // ---- Нормаль ----
+        Vec3 N = C.subtract(A).cross(B.subtract(A)).normalize();
+
+        for (double[] lp : points) {
             double u = lp[0];
             double v = lp[1];
 
-            Vec3 P = localToGlobal(A, B, C, u, v);
+            Vec3 P = isLocal ? localToGlobal(A, B, C, u, v) : new Vec3(lp[0], lp[1], lp[2]);
 
             Vec3 V = P.subtract(observer).normalize();
 
@@ -96,7 +146,10 @@ public class App {
 
             totalBrightness = totalBrightness.multiply(1 / Math.PI);
 
-            System.out.printf("Точка (u=%.4f, v=%.4f)%n", u, v);
+            if (isLocal) {
+                System.out.printf("Точка (u=%.4f, v=%.4f)%n", u, v);
+            }
+
             System.out.printf("Глобальные координаты: %s%n", P);
             System.out.printf("Яркость RGB: %s%n", totalBrightness);
             System.out.println("---------------------------------");
