@@ -28,8 +28,8 @@ public class App {
     public static void main( String[] args ) {
         // ---- Треугольник ----
         Vec3 A = new Vec3(0, 0, 0);
-        Vec3 B = new Vec3(5, 0, 0);
-        Vec3 C = new Vec3(0, 5, 0);
+        Vec3 B = new Vec3(2, 0, 0);
+        Vec3 C = new Vec3(0, 2, 0);
 
         // ---- Нормаль ----
         Vec3 N = C.subtract(A).cross(B.subtract(A)).normalize();
@@ -38,27 +38,24 @@ public class App {
         List<Light> lights = new ArrayList<>();
 
         lights.add(new Light(
-                new Vec3(3, 3, 5),
-                new Vec3(3, 3, 5).multiply(-1),
-                new Vec3(1, 1, 1)
+                new Vec3(1, 0, 2),
+                new Vec3(-0.333333333333333, 0.666666666666666, -0.666666666666666),
+                new Vec3(500, 500, 0)
         ));
 
         // ---- Наблюдатель ----
-        Vec3 observer = new Vec3(2, 2, 10);
+        Vec3 observer = new Vec3(2, 2, 2);
 
         // ---- Параметры материала ----
-        double kd = 0.7; // коэффициент диффузного отражения
-        double ks = 0.3; // коэффициент зеркального отражения
-        double ke = 20; // коэффициент, определяющий ширину блика
+        double kd = 0.5; // коэффициент диффузного отражения
+        double ks = 0.5; // коэффициент зеркального отражения
+        double ke = 200; // коэффициент, определяющий ширину блика
 
-        Vec3 K = new Vec3(1, 0.5, 0.3); // цвет поверхности
+        Vec3 K = new Vec3(1, 0, 0); // цвет поверхности
 
         // ---- Локальные точки ----
         double[][] localPoints = {
-                {0.1, 0.1},
-                {0.2, 0.3},
-                {0.4, 0.2},
-                {0.3, 0.4}
+                {1, 0},
         };
 
         for (double[] lp : localPoints) {
@@ -95,6 +92,8 @@ public class App {
                         )
                 );
             }
+
+            totalBrightness = totalBrightness.multiply(1 / Math.PI);
 
             System.out.printf("Точка (u=%.4f, v=%.4f)%n", u, v);
             System.out.printf("Глобальные координаты: %s%n", P);
