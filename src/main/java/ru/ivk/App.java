@@ -27,9 +27,9 @@ public class App {
 
     public static void main( String[] args ) {
         // ---- Треугольник ----
-        Vec3 A = new Vec3(0, 0, 0);
-        Vec3 B = new Vec3(2, 0, 0);
-        Vec3 C = new Vec3(0, 2, 0);
+        Vec3 A = new Vec3(0, 0, 0); // P_0
+        Vec3 B = new Vec3(2, 0, 0); // P_1
+        Vec3 C = new Vec3(0, 2, 0); // P_2
 
         // ---- Нормаль ----
         Vec3 N = C.subtract(A).cross(B.subtract(A)).normalize();
@@ -38,9 +38,9 @@ public class App {
         List<Light> lights = new ArrayList<>();
 
         lights.add(new Light(
-                new Vec3(1, 0, 2),
-                new Vec3(-0.333333333333333, 0.666666666666666, -0.666666666666666),
-                new Vec3(500, 500, 0)
+                new Vec3(1, 0, 2), // расположение
+                new Vec3(-0.333333333333333, 0.666666666666666, -0.666666666666666), // направление
+                new Vec3(500, 500, 0) // I_0
         ));
 
         // ---- Наблюдатель ----
@@ -56,6 +56,7 @@ public class App {
         // ---- Локальные точки ----
         double[][] localPoints = {
                 {1, 0},
+                {0, 1}
         };
 
         for (double[] lp : localPoints) {
