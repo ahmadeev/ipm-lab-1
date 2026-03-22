@@ -40,7 +40,7 @@ public class App {
         lights.add(new Light(
                 new Vec3(3, 3, 5),
                 new Vec3(3, 3, 5).multiply(-1),
-                new Vec3(255, 255, 255)
+                new Vec3(1, 1, 1)
         ));
 
         // ---- Наблюдатель ----
