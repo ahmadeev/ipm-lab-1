@@ -14,7 +14,6 @@ public class Main {
     }
 
     private static double analyticalIntegral(double a, double b) {
-        // ∫x^2 dx = x^3 / 3
         return (Math.pow(b, 3) - Math.pow(a, 3)) / 3.0;
     }
 
