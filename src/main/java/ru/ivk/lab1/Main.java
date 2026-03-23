@@ -120,7 +120,7 @@ public class Main {
                 Vec3 E = I.multiply(cosAlpha / (R * R));
                 totalE = totalE.add(E);
 
-                double brdf = computeBRDF(N, s, V, kd, ks, ke);
+                double brdf = computeF(N, s, V, kd, ks, ke);
 
                 Vec3 brightnessFactor = E.multiply(brdf);
 
@@ -153,7 +153,7 @@ public class Main {
         );
     }
 
-    public static double computeBRDF(Vec3 N, Vec3 s, Vec3 V, double kd, double ks, double ke) {
+    public static double computeF(Vec3 N, Vec3 s, Vec3 V, double kd, double ks, double ke) {
         double diffuse = kd * Math.max(0, N.dot(s));
 
         Vec3 h = s.add(V).normalize();
