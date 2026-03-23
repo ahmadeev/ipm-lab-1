@@ -56,7 +56,7 @@ public class Main {
             sum += f(x) / p.apply(x);
         }
 
-        return (b - a) * sum / N;
+        return sum / N; // почему умножение на (b - a) ломает
     }
 
     private static double multipleImportanceSampling(
@@ -96,7 +96,7 @@ public class Main {
         double sum = 0;
 
         for (int i = 0; i < N; i++) {
-            double x = a + (b - a) * random.nextDouble() / threshold;
+            double x = a + (b - a) * random.nextDouble(); // почему деление на threshold портит ?
 
             if (random.nextDouble() <= threshold) {
                 sum += f(x) / threshold;
@@ -107,8 +107,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        double a = 100;
-        double b = 101;
+        double a = 2;
+        double b = 5;
 
         int[] samples = {100, 1_000, 10_000, 100_000};
 
