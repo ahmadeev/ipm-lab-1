@@ -29,7 +29,7 @@ public class Main {
     }
 
     private static double stratifiedMC(double a, double b, int N, double step) {
-        int strata = (int)((b - a) / step);
+        int strata = (int) ((b - a) / step); // промежутков
         double result = 0;
 
         for (int i = 0; i < strata; i++) {
@@ -37,12 +37,13 @@ public class Main {
             double right = left + step;
 
             double sum = 0;
+
             for (int j = 0; j < N / strata; j++) {
                 double x = left + (right - left) * random.nextDouble();
                 sum += f(x);
             }
 
-            result += (right - left) * sum / (N / strata);
+            result += (right - left) * sum / ((double) N / strata);
         }
 
         return result;
@@ -56,7 +57,7 @@ public class Main {
             sum += f(x) / p.apply(x);
         }
 
-        return sum / N; // почему умножение на (b - a) ломает
+        return sum / N;
     }
 
     private static double multipleImportanceSampling(
