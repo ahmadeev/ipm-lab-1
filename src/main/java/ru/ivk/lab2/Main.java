@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 // MonteCarloIntegration
 public class Main {
-    private static final Random random = new Random();
+    private static final Random random = new Random(123456);
 
     private static double f(double x) {
         return x * x;
@@ -57,8 +57,6 @@ public class Main {
             sum += f(x) / p.apply(x);
         }
 
-        System.out.println(sum);
-
         return (b - a) * sum / N;
     }
 
@@ -99,9 +97,9 @@ public class Main {
         double sum = 0;
 
         for (int i = 0; i < N; i++) {
-            double x = a + (b - a) * random.nextDouble();
+            double x = a + (b - a) * random.nextDouble() / threshold;
 
-            if (random.nextDouble() < threshold) {
+            if (random.nextDouble() <= threshold) {
                 sum += f(x) / threshold;
             }
         }
