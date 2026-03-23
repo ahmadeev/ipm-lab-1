@@ -44,32 +44,32 @@ public class App {
 
         Double[][] localPoints = generateSeries(localXs, localYs);
 
-/*        compute(
+        compute(
                 localPoints,
                 true,
                 lights,
                 A, B, C,
                 observer,
                 K, kd, ks, ke
-        );*/
+        );
 
         // ---- Глобальные точки ----
         Double[][] globalPoints = {
-                {-100.0, -37.1391, -92.8477},
+                {-100.0, -37.14, -92.85},
                 {0.0, 0.0, 0.0},
-                {0.0, 5.5709, 13.9272},
-                {0.0, 0.7428, 1.8570},
-                {100.0, 37.1391, 92.8477}
+                {2.0, 0.74, 1.86},
+                {5.0, 5.57, 13.93},
+                {10.0, 37.14, 92.85}
         };
 
-        compute(
+/*        compute(
                 globalPoints,
                 false,
                 lights,
                 A, B, C,
                 observer,
                 K, kd, ks, ke
-        );
+        );*/
     }
 
     private static void compute(
