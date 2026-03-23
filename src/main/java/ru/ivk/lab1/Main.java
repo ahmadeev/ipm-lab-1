@@ -1,4 +1,4 @@
-package ru.ivk;
+package ru.ivk.lab1;
 
 import ru.ivk.math.Vec3;
 import ru.ivk.utils.Light;
@@ -6,7 +6,7 @@ import ru.ivk.utils.Light;
 import java.util.ArrayList;
 import java.util.List;
 
-public class App {
+public class Main {
     public static void main( String[] args ) {
         // ---- Треугольник ----
         Vec3 A = new Vec3(0, 0, 0); // P_0
