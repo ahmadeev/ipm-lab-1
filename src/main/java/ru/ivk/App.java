@@ -44,22 +44,22 @@ public class App {
 
         Double[][] localPoints = generateSeries(localXs, localYs);
 
-        compute(
+/*        compute(
                 localPoints,
                 true,
                 lights,
                 A, B, C,
                 observer,
                 K, kd, ks, ke
-        );
+        );*/
 
-/*        // ---- Глобальные точки ----
-        double[][] globalPoints = {
-                {-100, -37.1391, -92.8477},
-                {0, 0, 0},
-                {0, 5.5709, 13.9272},
-                {0, 0.7428, 1.8570},
-                {100, 37.1391, 92.8477}
+        // ---- Глобальные точки ----
+        Double[][] globalPoints = {
+                {-100.0, -37.1391, -92.8477},
+                {0.0, 0.0, 0.0},
+                {0.0, 5.5709, 13.9272},
+                {0.0, 0.7428, 1.8570},
+                {100.0, 37.1391, 92.8477}
         };
 
         compute(
@@ -69,7 +69,7 @@ public class App {
                 A, B, C,
                 observer,
                 K, kd, ks, ke
-        );*/
+        );
     }
 
     private static void compute(
@@ -87,6 +87,14 @@ public class App {
     ) {
         // ---- Нормаль ----
         Vec3 N = C.subtract(A).cross(B.subtract(A)).normalize();
+
+        if (isLocal) {
+            System.out.printf("| %-7s | %-7s || %-7s | %-7s | %-7s || %-28s | %-28s |%n", "u", "v", "x", "y", "z", "E (освещенность)", "L (яркость)");
+            System.out.printf("|---------|---------||---------|---------|---------||------------------------------|------------------------------|%n");
+        } else {
+            System.out.printf("| %-7s | %-7s | %-7s || %-28s | %-28s |%n", "x", "y", "z", "E (освещенность)", "L (яркость)");
+            System.out.printf("|---------|---------|---------||------------------------------|------------------------------|%n");
+        }
 
         for (Double[] lp : points) {
             double u = lp[0];
@@ -128,13 +136,12 @@ public class App {
             totalBrightness = totalBrightness.multiply(1 / Math.PI);
 
             if (isLocal) {
-                System.out.printf("Точка (u=%.4f, v=%.4f)%n", u, v);
+                System.out.printf("| %-7.2f | %-7.2f || %-7.2f | %-7.2f | %-7.2f || %-28s | %-28s |%n", u, v, P.x, P.y, P.z, totalE, totalBrightness);
+                System.out.printf("|---------|---------||---------|---------|---------||------------------------------|------------------------------|%n");
+            } else {
+                System.out.printf("| %-7.2f | %-7.2f | %-7.2f || %-28s | %-28s |%n", P.x, P.y, P.z, totalE, totalBrightness);
+                System.out.printf("|---------|---------|---------||------------------------------|------------------------------|%n");
             }
-
-            System.out.printf("Глобальные координаты: %s%n", P);
-            System.out.printf("Освещенность: %s%n", totalE);
-            System.out.printf("Яркость RGB: %s%n", totalBrightness);
-            System.out.println("---------------------------------");
         }
     }
 
