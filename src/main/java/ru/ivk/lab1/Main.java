@@ -156,7 +156,7 @@ public class Main {
     public static double computeF(Vec3 N, Vec3 s, Vec3 V, double kd, double ks, double ke) {
         double diffuse = kd * Math.max(0, N.dot(s));
 
-        Vec3 h = s.add(V).normalize();
+        Vec3 h = s.multiply(-1).add(V.multiply(-1)).normalize();
 
         double specular = ks * Math.pow(Math.max(0, N.dot(h)), ke);
 
