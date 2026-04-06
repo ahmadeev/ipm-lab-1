@@ -1,6 +1,6 @@
-package ru.ivk.utils;
+package ru.ivk.lab1;
 
-import ru.ivk.math.Vec3;
+import ru.ivk.common.math.Vec3;
 
 public class Light {
     public Vec3 position;

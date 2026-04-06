@@ -97,7 +97,7 @@ public class Main {
         double sum = 0;
 
         for (int i = 0; i < N; i++) {
-            double x = a + (b - a) * random.nextDouble(); // почему деление на threshold портит ?
+            double x = a + (b - a) * random.nextDouble();
 
             if (random.nextDouble() <= threshold) {
                 sum += f(x) / threshold;
@@ -146,6 +146,8 @@ public class Main {
             double rr05 = russianRoulette(a, b, N, 0.5);
             double rr075 = russianRoulette(a, b, N, 0.75);
             double rr095 = russianRoulette(a, b, N, 0.95);
+
+            System.out.printf("Оценка погрешности: %.6f%n", exact / Math.sqrt(N));
 
             System.out.printf("%-32s %-10d %-20.10f %-20.10f%n", "Simple MC", N, simple, Math.abs(simple - exact));
             System.out.printf("%-32s %-10d %-20.10f %-20.10f%n", "Strat (step=1)", N, strat1, Math.abs(strat1 - exact));

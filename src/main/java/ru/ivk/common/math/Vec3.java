@@ -1,4 +1,4 @@
-package ru.ivk.math;
+package ru.ivk.common.math;
 
 import java.util.Objects;
 
@@ -15,11 +15,11 @@ public class Vec3 {
         return new Vec3(x + v.x, y + v.y, z + v.z);
     }
 
-    public Vec3 subtract(Vec3 v) {
+    public Vec3 sub(Vec3 v) {
         return new Vec3(x - v.x, y - v.y, z - v.z);
     }
 
-    public Vec3 multiply(double scalar) {
+    public Vec3 mul(double scalar) {
         return new Vec3(x * scalar, y * scalar, z * scalar);
     }
 
@@ -46,7 +46,7 @@ public class Vec3 {
             return new Vec3(0,0,0);
         }
 
-        return multiply(1.0 / len); // v_norm = v / |v|
+        return mul(1.0 / len); // v_norm = v / |v|
     }
 
     @Override
