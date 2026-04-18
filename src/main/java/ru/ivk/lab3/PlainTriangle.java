@@ -1,7 +1,5 @@
 package ru.ivk.lab3;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import ru.ivk.common.math.Plane;
 import ru.ivk.common.math.Vec3;
 
@@ -9,17 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@RequiredArgsConstructor
 public class PlainTriangle {
     private static final Random random = new Random(123456L);
-
     private static final double EPSILON = 1e-6;
 
     private final Vec3 vertex1;
     private final Vec3 vertex2;
     private final Vec3 vertex3;
 
-    protected List<Vec3> generateUniformPoints(Vec3 v1, Vec3 v2, Vec3 v3, int sampleCount) {
+    public PlainTriangle(Vec3 vertex1, Vec3 vertex2, Vec3 vertex3) {
+        this.vertex1 = copyOf(vertex1);
+        this.vertex2 = copyOf(vertex2);
+        this.vertex3 = copyOf(vertex3);
+    }
+
+    public List<Vec3> generateUniformPoints(int sampleCount) {
         if (sampleCount <= 0) {
             throw new IllegalArgumentException("sampleCount must be positive");
         }
@@ -27,13 +29,13 @@ public class PlainTriangle {
         List<Vec3> points = new ArrayList<>(sampleCount);
 
         for (int i = 0; i < sampleCount; i++) {
-            points.add(sampleUniformPoint(v1, v2, v3));
+            points.add(sampleUniformPoint());
         }
 
         return points;
     }
 
-    private Vec3 sampleUniformPoint(Vec3 v1, Vec3 v2, Vec3 v3) {
+    private Vec3 sampleUniformPoint() {
         double xiU = random.nextDouble();
         double xiV = random.nextDouble();
 
@@ -42,18 +44,18 @@ public class PlainTriangle {
             xiV = 1.0 - xiV;
         }
 
-        Vec3 u = v2.sub(v1);
-        Vec3 v = v3.sub(v1);
+        Vec3 u = vertex2.sub(vertex1);
+        Vec3 v = vertex3.sub(vertex1);
 
-        return v1.add(u.mul(xiU)).add(v.mul(xiV));
+        return vertex1.add(u.mul(xiU)).add(v.mul(xiV));
     }
 
-    protected TriangleValidationResult validatePoints(List<Vec3> points, Vec3 v1, Vec3 v2, Vec3 v3) {
-        Vec3 edge12 = v2.sub(v1);
-        Vec3 edge23 = v3.sub(v2);
-        Vec3 edge31 = v1.sub(v3);
-        Vec3 triangleNormal = edge12.cross(v3.sub(v1));
-        Plane plane = new Plane(triangleNormal, v1);
+    public ValidationResult validatePoints(List<Vec3> points) {
+        Vec3 edge12 = vertex2.sub(vertex1);
+        Vec3 edge23 = vertex3.sub(vertex2);
+        Vec3 edge31 = vertex1.sub(vertex3);
+        Vec3 triangleNormal = edge12.cross(vertex3.sub(vertex1));
+        Plane plane = new Plane(triangleNormal, vertex1);
         double edgeTolerance = EPSILON * Math.max(1.0, triangleNormal.dot(triangleNormal));
 
         int pointsOffPlane = 0;
@@ -69,9 +71,9 @@ public class PlainTriangle {
                 pointsOffPlane++;
             }
 
-            double s1 = triangleNormal.dot(edge12.cross(point.sub(v1)));
-            double s2 = triangleNormal.dot(edge23.cross(point.sub(v2)));
-            double s3 = triangleNormal.dot(edge31.cross(point.sub(v3)));
+            double s1 = triangleNormal.dot(edge12.cross(point.sub(vertex1)));
+            double s2 = triangleNormal.dot(edge23.cross(point.sub(vertex2)));
+            double s3 = triangleNormal.dot(edge31.cross(point.sub(vertex3)));
 
             double minSign = Math.min(s1, Math.min(s2, s3));
             double maxSign = Math.max(s1, Math.max(s2, s3));
@@ -88,7 +90,7 @@ public class PlainTriangle {
             }
         }
 
-        return new TriangleValidationResult(
+        return new ValidationResult(
                 pointsOffPlane,
                 pointsOutsideTriangle,
                 maxPlaneDistance,
@@ -96,7 +98,7 @@ public class PlainTriangle {
         );
     }
 
-    protected void printReport(List<Vec3> points, int previewCount) {
+    public void printReport(List<Vec3> points, int previewCount) {
         System.out.println("Uniform points inside triangle");
         System.out.printf("V1 = %s%n", vertex1);
         System.out.printf("V2 = %s%n", vertex2);
@@ -113,7 +115,7 @@ public class PlainTriangle {
         System.out.println();
     }
 
-    protected void printValidationReport(TriangleValidationResult validation) {
+    public void printValidationReport(ValidationResult validation) {
         System.out.println("Validation:");
         System.out.printf("Points off triangle plane: %d%n", validation.pointsOffPlane);
         System.out.printf("Points outside triangle by edge test: %d%n", validation.pointsOutsideTriangle);
@@ -122,11 +124,26 @@ public class PlainTriangle {
         System.out.println();
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-    protected static final class TriangleValidationResult {
+    private static Vec3 copyOf(Vec3 source) {
+        return new Vec3(source.x, source.y, source.z);
+    }
+
+    public static final class ValidationResult {
         private final int pointsOffPlane;
         private final int pointsOutsideTriangle;
         private final double maxPlaneDistance;
         private final double maxEdgeViolation;
+
+        private ValidationResult(
+                int pointsOffPlane,
+                int pointsOutsideTriangle,
+                double maxPlaneDistance,
+                double maxEdgeViolation
+        ) {
+            this.pointsOffPlane = pointsOffPlane;
+            this.pointsOutsideTriangle = pointsOutsideTriangle;
+            this.maxPlaneDistance = maxPlaneDistance;
+            this.maxEdgeViolation = maxEdgeViolation;
+        }
     }
 }

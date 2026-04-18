@@ -1,7 +1,5 @@
 package ru.ivk.lab3;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import ru.ivk.common.math.Plane;
 import ru.ivk.common.math.Vec3;
 
@@ -9,46 +7,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@RequiredArgsConstructor
 public class PlainCircle {
     private static final Random random = new Random(123456L);
-
     private static final double EPSILON = 1e-6;
 
     private final Vec3 circleCenter;
     private final Vec3 circleNormal;
     private final double circleRadius;
 
-    protected List<Vec3> generateUniformPoints(Vec3 center, Vec3 normal, double radius, int sampleCount) {
+    public PlainCircle(Vec3 circleCenter, Vec3 circleNormal, double circleRadius) {
+        if (circleRadius <= 0.0) {
+            throw new IllegalArgumentException("radius must be positive");
+        }
+
+        this.circleCenter = copyOf(circleCenter);
+        this.circleNormal = requireUnitNormal(circleNormal);
+        this.circleRadius = circleRadius;
+    }
+
+    public List<Vec3> generateUniformPoints(int sampleCount) {
         if (sampleCount <= 0) {
             throw new IllegalArgumentException("sampleCount must be positive");
         }
 
-        if (radius <= 0.0) {
-            throw new IllegalArgumentException("radius must be positive");
-        }
-
-        Vec3 normalizedNormal = requireUnitNormal(normal);
-        Vec3 uAxis = buildPerpendicularAxis(normalizedNormal);
-        Vec3 vAxis = normalizedNormal.cross(uAxis).normalize();
+        Vec3 uAxis = buildPerpendicularAxis(circleNormal);
+        Vec3 vAxis = circleNormal.cross(uAxis).normalize();
 
         List<Vec3> points = new ArrayList<>(sampleCount);
 
         for (int i = 0; i < sampleCount; i++) {
-            points.add(sampleUniformPoint(center, radius, uAxis, vAxis));
+            points.add(sampleUniformPoint(uAxis, vAxis));
         }
 
         return points;
     }
 
-    private Vec3 sampleUniformPoint(Vec3 center, double radius, Vec3 uAxis, Vec3 vAxis) {
+    private Vec3 sampleUniformPoint(Vec3 uAxis, Vec3 vAxis) {
         double xiRadius = random.nextDouble();
         double xiPhi = random.nextDouble();
 
-        double r = radius * Math.sqrt(xiRadius);
+        double r = circleRadius * Math.sqrt(xiRadius);
         double phi = 2.0 * Math.PI * xiPhi;
 
-        return center
+        return circleCenter
                 .add(vAxis.mul(r * Math.cos(phi)))
                 .add(uAxis.mul(r * Math.sin(phi)));
     }
@@ -83,10 +84,9 @@ public class PlainCircle {
         return new Vec3(0, 0, 1);
     }
 
-    protected CircleValidationResult validatePoints(List<Vec3> points, Vec3 center, Vec3 normal, double radius) {
-        Vec3 normalizedNormal = requireUnitNormal(normal);
-        Plane plane = new Plane(normalizedNormal, center);
-        double radialTolerance = EPSILON * Math.max(1.0, radius);
+    public ValidationResult validatePoints(List<Vec3> points) {
+        Plane plane = new Plane(circleNormal, circleCenter);
+        double radialTolerance = EPSILON * Math.max(1.0, circleRadius);
 
         int pointsOffPlane = 0;
         int pointsOutsideCircle = 0;
@@ -101,11 +101,11 @@ public class PlainCircle {
                 pointsOffPlane++;
             }
 
-            Vec3 offset = point.sub(center);
-            double normalProjection = offset.dot(normalizedNormal);
+            Vec3 offset = point.sub(circleCenter);
+            double normalProjection = offset.dot(circleNormal);
             double radialSquared = offset.dot(offset) - normalProjection * normalProjection;
             double radialDistance = Math.sqrt(Math.max(0.0, radialSquared));
-            double radialOvershoot = Math.max(0.0, radialDistance - radius);
+            double radialOvershoot = Math.max(0.0, radialDistance - circleRadius);
 
             maxRadialOvershoot = Math.max(maxRadialOvershoot, radialOvershoot);
 
@@ -114,7 +114,7 @@ public class PlainCircle {
             }
         }
 
-        return new CircleValidationResult(
+        return new ValidationResult(
                 pointsOffPlane,
                 pointsOutsideCircle,
                 maxPlaneDistance,
@@ -122,7 +122,7 @@ public class PlainCircle {
         );
     }
 
-    protected void printReport(List<Vec3> points, int previewCount) {
+    public void printReport(List<Vec3> points, int previewCount) {
         System.out.println("Uniform points inside circle");
         System.out.printf("C = %s%n", circleCenter);
         System.out.printf("N = %s%n", circleNormal);
@@ -139,7 +139,7 @@ public class PlainCircle {
         System.out.println();
     }
 
-    protected void printValidationReport(CircleValidationResult validation) {
+    public void printValidationReport(ValidationResult validation) {
         System.out.println("Validation:");
         System.out.printf("Points off circle plane: %d%n", validation.pointsOffPlane);
         System.out.printf("Points outside circle by radial check: %d%n", validation.pointsOutsideCircle);
@@ -148,11 +148,26 @@ public class PlainCircle {
         System.out.println();
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-    protected static final class CircleValidationResult {
+    private static Vec3 copyOf(Vec3 source) {
+        return new Vec3(source.x, source.y, source.z);
+    }
+
+    public static final class ValidationResult {
         private final int pointsOffPlane;
         private final int pointsOutsideCircle;
         private final double maxPlaneDistance;
         private final double maxRadialOvershoot;
+
+        private ValidationResult(
+                int pointsOffPlane,
+                int pointsOutsideCircle,
+                double maxPlaneDistance,
+                double maxRadialOvershoot
+        ) {
+            this.pointsOffPlane = pointsOffPlane;
+            this.pointsOutsideCircle = pointsOutsideCircle;
+            this.maxPlaneDistance = maxPlaneDistance;
+            this.maxRadialOvershoot = maxRadialOvershoot;
+        }
     }
 }
