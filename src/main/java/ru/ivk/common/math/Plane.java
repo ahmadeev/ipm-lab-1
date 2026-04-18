@@ -7,8 +7,12 @@ public class Plane {
     private final double d;
 
     public Plane(Vec3 normal, Vec3 planePoint) {
-        this.normal = normal;
-        this.d = -(normal.x * planePoint.x + normal.y * planePoint.y + normal.z * planePoint.z);
+        if (normal.length() == 0.0) {
+            throw new IllegalArgumentException("normal must be non-zero");
+        }
+
+        this.normal = new Vec3(normal.x, normal.y, normal.z);
+        this.d = -(this.normal.x * planePoint.x + this.normal.y * planePoint.y + this.normal.z * planePoint.z);
     }
 
     public double calc(Vec3 point) {
@@ -20,6 +24,6 @@ public class Plane {
     }
 
     public boolean isInPlane(Vec3 point) {
-        return calc(point) < PRECISION;
+        return calcDistanceTo(point) <= PRECISION;
     }
 }
