@@ -34,7 +34,7 @@ public class Main {
 
         /* CIRCLE */
 
-        PlainCircle plainCircle = new PlainCircle();
+        PlainCircle plainCircle = new PlainCircle(CIRCLE_CENTER, CIRCLE_NORMAL, CIRCLE_RADIUS);
 
         List<Vec3> circlePoints = plainCircle.generateUniformPoints(CIRCLE_CENTER, CIRCLE_NORMAL, CIRCLE_RADIUS, SAMPLE_COUNT);
         plainCircle.printReport(circlePoints, PREVIEW_COUNT);

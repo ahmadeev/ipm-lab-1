@@ -15,9 +15,9 @@ public class PlainCircle {
 
     private static final double EPSILON = 1e-6;
 
-    private final Vec3 circleCenter = new Vec3(2, -1, 3);
-    private final Vec3 circleNormal = new Vec3(2, 3, 4).normalize();
-    private final double circleRadius = 3.5;
+    private final Vec3 circleCenter;
+    private final Vec3 circleNormal;
+    private final double circleRadius;
 
     protected List<Vec3> generateUniformPoints(Vec3 center, Vec3 normal, double radius, int sampleCount) {
         if (sampleCount <= 0) {
