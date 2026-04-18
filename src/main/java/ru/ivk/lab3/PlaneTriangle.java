@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class PlainTriangle {
+public class PlaneTriangle {
     private static final Random random = new Random(123456L);
     private static final double EPSILON = 1e-6;
 
@@ -15,7 +15,7 @@ public class PlainTriangle {
     private final Vec3 vertex2;
     private final Vec3 vertex3;
 
-    public PlainTriangle(Vec3 vertex1, Vec3 vertex2, Vec3 vertex3) {
+    public PlaneTriangle(Vec3 vertex1, Vec3 vertex2, Vec3 vertex3) {
         this.vertex1 = copyOf(vertex1);
         this.vertex2 = copyOf(vertex2);
         this.vertex3 = copyOf(vertex3);

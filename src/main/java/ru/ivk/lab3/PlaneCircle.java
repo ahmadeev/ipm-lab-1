@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class PlainCircle {
+public class PlaneCircle {
     private static final Random random = new Random(123456L);
     private static final double EPSILON = 1e-6;
 
@@ -15,7 +15,7 @@ public class PlainCircle {
     private final Vec3 circleNormal;
     private final double circleRadius;
 
-    public PlainCircle(Vec3 circleCenter, Vec3 circleNormal, double circleRadius) {
+    public PlaneCircle(Vec3 circleCenter, Vec3 circleNormal, double circleRadius) {
         if (circleRadius <= 0.0) {
             throw new IllegalArgumentException("radius must be positive");
         }

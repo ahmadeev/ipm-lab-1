@@ -19,22 +19,22 @@ public class Main {
     public static void main(String[] args) {
         /* TRIANGLE */
 
-        PlainTriangle plainTriangle = new PlainTriangle(TRIANGLE_V1, TRIANGLE_V2, TRIANGLE_V3);
+        PlaneTriangle planeTriangle = new PlaneTriangle(TRIANGLE_V1, TRIANGLE_V2, TRIANGLE_V3);
 
-        List<Vec3> trianglePoints = plainTriangle.generateUniformPoints(SAMPLE_COUNT);
-        plainTriangle.printReport(trianglePoints, PREVIEW_COUNT);
+        List<Vec3> trianglePoints = planeTriangle.generateUniformPoints(SAMPLE_COUNT);
+        planeTriangle.printReport(trianglePoints, PREVIEW_COUNT);
 
-        PlainTriangle.ValidationResult triangleValidation = plainTriangle.validatePoints(trianglePoints);
-        plainTriangle.printValidationReport(triangleValidation);
+        PlaneTriangle.ValidationResult triangleValidation = planeTriangle.validatePoints(trianglePoints);
+        planeTriangle.printValidationReport(triangleValidation);
 
         /* CIRCLE */
 
-        PlainCircle plainCircle = new PlainCircle(CIRCLE_CENTER, CIRCLE_NORMAL, CIRCLE_RADIUS);
+        PlaneCircle planeCircle = new PlaneCircle(CIRCLE_CENTER, CIRCLE_NORMAL, CIRCLE_RADIUS);
 
-        List<Vec3> circlePoints = plainCircle.generateUniformPoints(SAMPLE_COUNT);
-        plainCircle.printReport(circlePoints, PREVIEW_COUNT);
+        List<Vec3> circlePoints = planeCircle.generateUniformPoints(SAMPLE_COUNT);
+        planeCircle.printReport(circlePoints, PREVIEW_COUNT);
 
-        PlainCircle.ValidationResult circleValidation = plainCircle.validatePoints(circlePoints);
-        plainCircle.printValidationReport(circleValidation);
+        PlaneCircle.ValidationResult circleValidation = planeCircle.validatePoints(circlePoints);
+        planeCircle.printValidationReport(circleValidation);
     }
 }
