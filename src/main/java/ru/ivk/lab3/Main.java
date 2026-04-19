@@ -36,5 +36,16 @@ public class Main {
 
         PlaneCircle.ValidationResult circleValidation = planeCircle.validatePoints(circlePoints);
         planeCircle.printValidationReport(circleValidation);
+
+        /* UNIT SPHERE */
+
+        UnitSphereDirections unitSphereDirections = new UnitSphereDirections();
+
+        List<Vec3> sphereDirections = unitSphereDirections.generateUniformDirections(SAMPLE_COUNT);
+        unitSphereDirections.printReport(sphereDirections, PREVIEW_COUNT);
+
+        UnitSphereDirections.ValidationResult sphereValidation =
+                unitSphereDirections.validateDirections(sphereDirections);
+        unitSphereDirections.printValidationReport(sphereValidation);
     }
 }
