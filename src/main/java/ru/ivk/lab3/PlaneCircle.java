@@ -4,12 +4,14 @@ import ru.ivk.common.math.Plane;
 import ru.ivk.common.math.Vec3;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class PlaneCircle {
     private static final Random random = new Random(123456L);
     private static final double EPSILON = 1e-6;
+    private static final int RADIAL_RING_COUNT = 10;
 
     private final Vec3 circleCenter;
     private final Vec3 circleNormal;
@@ -92,6 +94,7 @@ public class PlaneCircle {
         int pointsOutsideCircle = 0;
         double maxPlaneDistance = 0.0;
         double maxRadialOvershoot = 0.0;
+        int[] ringCounts = new int[RADIAL_RING_COUNT];
 
         for (Vec3 point : points) {
             double planeDistance = plane.calcDistanceTo(point);
@@ -112,13 +115,33 @@ public class PlaneCircle {
             if (radialOvershoot > radialTolerance) {
                 pointsOutsideCircle++;
             }
+
+            double rho = clamp((radialDistance * radialDistance) / (circleRadius * circleRadius), 0.0, 1.0);
+            int ringIndex = mapRhoToRingIndex(rho);
+            ringCounts[ringIndex]++;
+        }
+
+        double expectedRingCount = points.size() / (double) RADIAL_RING_COUNT;
+        double maxRingAbsoluteDeviation = 0.0;
+        double maxRingRelativeDeviation = 0.0;
+
+        for (int ringCount : ringCounts) {
+            double absoluteDeviation = Math.abs(ringCount - expectedRingCount);
+            double relativeDeviation = expectedRingCount == 0.0 ? 0.0 : absoluteDeviation / expectedRingCount;
+
+            maxRingAbsoluteDeviation = Math.max(maxRingAbsoluteDeviation, absoluteDeviation);
+            maxRingRelativeDeviation = Math.max(maxRingRelativeDeviation, relativeDeviation);
         }
 
         return new ValidationResult(
                 pointsOffPlane,
                 pointsOutsideCircle,
                 maxPlaneDistance,
-                maxRadialOvershoot
+                maxRadialOvershoot,
+                ringCounts,
+                expectedRingCount,
+                maxRingAbsoluteDeviation,
+                maxRingRelativeDeviation
         );
     }
 
@@ -145,6 +168,10 @@ public class PlaneCircle {
         System.out.printf("Точек вне круга: %d%n", validation.pointsOutsideCircle);
         System.out.printf("Макс. расстояние до плоскости круга: %.12f%n", validation.maxPlaneDistance);
         System.out.printf("Макс. выход за радиус круга: %.12f%n", validation.maxRadialOvershoot);
+        System.out.printf("Ожидаемое число точек в каждом кольце: %.2f%n", validation.expectedRingCount);
+        System.out.printf("Число точек по кольцам равной площади: %s%n", Arrays.toString(validation.ringCounts));
+        System.out.printf("Макс. абсолютное отклонение по кольцам: %.2f%n", validation.maxRingAbsoluteDeviation);
+        System.out.printf("Макс. относительное отклонение по кольцам: %.6f%n", validation.maxRingRelativeDeviation);
         System.out.println();
     }
 
@@ -152,22 +179,48 @@ public class PlaneCircle {
         return new Vec3(source.x, source.y, source.z);
     }
 
+    private static int mapRhoToRingIndex(double rho) {
+        int ringIndex = (int) (rho * RADIAL_RING_COUNT);
+
+        if (ringIndex == RADIAL_RING_COUNT) {
+            return RADIAL_RING_COUNT - 1;
+        }
+
+        return ringIndex;
+    }
+
+    private static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
     public static final class ValidationResult {
         private final int pointsOffPlane;
         private final int pointsOutsideCircle;
         private final double maxPlaneDistance;
         private final double maxRadialOvershoot;
+        private final int[] ringCounts;
+        private final double expectedRingCount;
+        private final double maxRingAbsoluteDeviation;
+        private final double maxRingRelativeDeviation;
 
         private ValidationResult(
                 int pointsOffPlane,
                 int pointsOutsideCircle,
                 double maxPlaneDistance,
-                double maxRadialOvershoot
+                double maxRadialOvershoot,
+                int[] ringCounts,
+                double expectedRingCount,
+                double maxRingAbsoluteDeviation,
+                double maxRingRelativeDeviation
         ) {
             this.pointsOffPlane = pointsOffPlane;
             this.pointsOutsideCircle = pointsOutsideCircle;
             this.maxPlaneDistance = maxPlaneDistance;
             this.maxRadialOvershoot = maxRadialOvershoot;
+            this.ringCounts = Arrays.copyOf(ringCounts, ringCounts.length);
+            this.expectedRingCount = expectedRingCount;
+            this.maxRingAbsoluteDeviation = maxRingAbsoluteDeviation;
+            this.maxRingRelativeDeviation = maxRingRelativeDeviation;
         }
     }
 }
