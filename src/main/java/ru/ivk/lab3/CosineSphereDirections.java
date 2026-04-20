@@ -56,7 +56,7 @@ public class CosineSphereDirections {
         }
 
         int directionsOffUnitSphere = 0;
-        int directionsBelowHemisphere = 0;
+        int directionsBelowSphere = 0;
         double maxLengthDeviation = 0.0;
         double minDotWithNormal = Double.POSITIVE_INFINITY;
         double sumMu = 0.0;
@@ -77,7 +77,7 @@ public class CosineSphereDirections {
             sumMu += mu;
 
             if (mu < -EPSILON) {
-                directionsBelowHemisphere++;
+                directionsBelowSphere++;
             }
 
             int muBinIndex = mapMuToBinIndex(clamp(mu, 0.0, 1.0));
@@ -107,7 +107,7 @@ public class CosineSphereDirections {
 
         return new ValidationResult(
                 directionsOffUnitSphere,
-                directionsBelowHemisphere,
+                directionsBelowSphere,
                 maxLengthDeviation,
                 minDotWithNormal,
                 meanMu,
