@@ -11,6 +11,10 @@ public class Vec3 {
         this.z = z;
     }
 
+    public static Vec3 copyOf(Vec3 source) {
+        return new Vec3(source.x, source.y, source.z);
+    }
+
     public Vec3 add(Vec3 v) {
         return new Vec3(x + v.x, y + v.y, z + v.z);
     }

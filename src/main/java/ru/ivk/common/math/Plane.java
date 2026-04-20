@@ -11,7 +11,7 @@ public class Plane {
             throw new IllegalArgumentException("normal must be non-zero");
         }
 
-        this.normal = new Vec3(normal.x, normal.y, normal.z);
+        this.normal = Vec3.copyOf(normal);
         this.d = -(this.normal.x * planePoint.x + this.normal.y * planePoint.y + this.normal.z * planePoint.z);
     }
 

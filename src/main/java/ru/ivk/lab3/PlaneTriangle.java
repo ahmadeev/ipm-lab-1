@@ -16,9 +16,9 @@ public class PlaneTriangle {
     private final Vec3 vertex3;
 
     public PlaneTriangle(Vec3 vertex1, Vec3 vertex2, Vec3 vertex3) {
-        this.vertex1 = copyOf(vertex1);
-        this.vertex2 = copyOf(vertex2);
-        this.vertex3 = copyOf(vertex3);
+        this.vertex1 = Vec3.copyOf(vertex1);
+        this.vertex2 = Vec3.copyOf(vertex2);
+        this.vertex3 = Vec3.copyOf(vertex3);
     }
 
     public List<Vec3> generateUniformPoints(int sampleCount) {
@@ -122,10 +122,6 @@ public class PlaneTriangle {
         System.out.printf("Макс. расстояние до плоскости треугольника: %.12f%n", validation.maxPlaneDistance);
         System.out.printf("Макс. нарушение по рёбрам треугольника: %.12f%n", validation.maxEdgeViolation);
         System.out.println();
-    }
-
-    private static Vec3 copyOf(Vec3 source) {
-        return new Vec3(source.x, source.y, source.z);
     }
 
     public static final class ValidationResult {

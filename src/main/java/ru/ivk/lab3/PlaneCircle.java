@@ -2,6 +2,7 @@ package ru.ivk.lab3;
 
 import ru.ivk.common.math.Plane;
 import ru.ivk.common.math.Vec3;
+import ru.ivk.common.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +23,7 @@ public class PlaneCircle {
             throw new IllegalArgumentException("radius must be positive");
         }
 
-        this.circleCenter = copyOf(circleCenter);
+        this.circleCenter = Vec3.copyOf(circleCenter);
         this.circleNormal = requireUnitNormal(circleNormal);
         this.circleRadius = circleRadius;
     }
@@ -116,7 +117,7 @@ public class PlaneCircle {
                 pointsOutsideCircle++;
             }
 
-            double rho = clamp((radialDistance * radialDistance) / (circleRadius * circleRadius), 0.0, 1.0);
+            double rho = Utils.clamp((radialDistance * radialDistance) / (circleRadius * circleRadius), 0.0, 1.0);
             int ringIndex = mapRhoToRingIndex(rho);
             ringCounts[ringIndex]++;
         }
@@ -175,10 +176,6 @@ public class PlaneCircle {
         System.out.println();
     }
 
-    private static Vec3 copyOf(Vec3 source) {
-        return new Vec3(source.x, source.y, source.z);
-    }
-
     private static int mapRhoToRingIndex(double rho) {
         int ringIndex = (int) (rho * RADIAL_RING_COUNT);
 
@@ -187,10 +184,6 @@ public class PlaneCircle {
         }
 
         return ringIndex;
-    }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
     }
 
     public static final class ValidationResult {

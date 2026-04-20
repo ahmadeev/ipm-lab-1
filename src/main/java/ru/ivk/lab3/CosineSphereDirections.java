@@ -1,6 +1,7 @@
 package ru.ivk.lab3;
 
 import ru.ivk.common.math.Vec3;
+import ru.ivk.common.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +10,6 @@ import java.util.List;
 public class CosineSphereDirections {
     private static final double EPSILON = 1e-6;
     private static final int MU_BIN_COUNT = 10;
-    private static final double EXPECTED_MEAN_MU = 2.0 / 3.0;
 
     private final Vec3 sphereCenter;
     private final Vec3 sphereNormal;
@@ -18,7 +18,7 @@ public class CosineSphereDirections {
     private final UnitSphereDirections unitSphereDirections = new UnitSphereDirections();
 
     public CosineSphereDirections(Vec3 sphereCenter, Vec3 sphereNormal) {
-        this.sphereCenter = copyOf(sphereCenter);
+        this.sphereCenter = Vec3.copyOf(sphereCenter);
         this.sphereNormal = requireUnitNormal(sphereNormal);
         this.uAxis = buildPerpendicularAxis(this.sphereNormal);
         this.vAxis = this.sphereNormal.cross(uAxis).normalize();
@@ -44,7 +44,7 @@ public class CosineSphereDirections {
         double combinedLength = combined.length();
 
         if (combinedLength <= EPSILON) {
-            return copyOf(sphereNormal);
+            return Vec3.copyOf(sphereNormal);
         }
 
         return combined.mul(1.0 / combinedLength);
@@ -59,7 +59,9 @@ public class CosineSphereDirections {
         int directionsBelowSphere = 0;
         double maxLengthDeviation = 0.0;
         double minDotWithNormal = Double.POSITIVE_INFINITY;
-        double sumMu = 0.0;
+        double sumX = 0.0;
+        double sumY = 0.0;
+        double sumZ = 0.0;
         int[] muBinCounts = new int[MU_BIN_COUNT];
 
         for (Vec3 direction : directions) {
@@ -72,15 +74,18 @@ public class CosineSphereDirections {
                 directionsOffUnitSphere++;
             }
 
-            double mu = clamp(direction.dot(sphereNormal), -1.0, 1.0);
+            sumX += direction.x;
+            sumY += direction.y;
+            sumZ += direction.z;
+
+            double mu = Utils.clamp(direction.dot(sphereNormal), -1.0, 1.0);
             minDotWithNormal = Math.min(minDotWithNormal, mu);
-            sumMu += mu;
 
             if (mu < -EPSILON) {
                 directionsBelowSphere++;
             }
 
-            int muBinIndex = mapMuToBinIndex(clamp(mu, 0.0, 1.0));
+            int muBinIndex = mapMuToBinIndex(Utils.clamp(mu, 0.0, 1.0));
             muBinCounts[muBinIndex]++;
         }
 
@@ -102,16 +107,14 @@ public class CosineSphereDirections {
             maxMuBinRelativeDeviation = Math.max(maxMuBinRelativeDeviation, relativeDeviation);
         }
 
-        double meanMu = sumMu / directions.size();
-        double meanMuDeviationFromExpected = Math.abs(meanMu - EXPECTED_MEAN_MU);
+        double meanResultantLength = Math.sqrt(sumX * sumX + sumY * sumY + sumZ * sumZ) / directions.size();
 
         return new ValidationResult(
                 directionsOffUnitSphere,
                 directionsBelowSphere,
                 maxLengthDeviation,
                 minDotWithNormal,
-                meanMu,
-                meanMuDeviationFromExpected,
+                meanResultantLength,
                 muBinCounts,
                 expectedMuBinCounts,
                 maxMuBinAbsoluteDeviation,
@@ -143,8 +146,7 @@ public class CosineSphereDirections {
         System.out.printf("Направлений ниже касательной плоскости: %d%n", validation.directionsBelowHemisphere);
         System.out.printf("Макс. отклонение длины: %.12f%n", validation.maxLengthDeviation);
         System.out.printf("Мин. dot(dir, N): %.12f%n", validation.minDotWithNormal);
-        System.out.printf("Среднее mu = dot(dir, N): %.12f%n", validation.meanMu);
-        System.out.printf("Отклонение среднего mu от 2/3: %.12f%n", validation.meanMuDeviationFromExpected);
+        System.out.printf("Средняя длина результирующего вектора: %.12f%n", validation.meanResultantLength);
         System.out.printf("Ожидаемые числа по mu-бинам: %s%n", formatDoubleArray(validation.expectedMuBinCounts));
         System.out.printf("Фактические числа по mu-бинам: %s%n", Arrays.toString(validation.muBinCounts));
         System.out.printf("Макс. абсолютное отклонение по mu-бинам: %.2f%n", validation.maxMuBinAbsoluteDeviation);
@@ -192,14 +194,6 @@ public class CosineSphereDirections {
         return muBinIndex;
     }
 
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
-    }
-
-    private static Vec3 copyOf(Vec3 source) {
-        return new Vec3(source.x, source.y, source.z);
-    }
-
     private static String formatDoubleArray(double[] values) {
         StringBuilder builder = new StringBuilder("[");
 
@@ -220,8 +214,7 @@ public class CosineSphereDirections {
         private final int directionsBelowHemisphere;
         private final double maxLengthDeviation;
         private final double minDotWithNormal;
-        private final double meanMu;
-        private final double meanMuDeviationFromExpected;
+        private final double meanResultantLength;
         private final int[] muBinCounts;
         private final double[] expectedMuBinCounts;
         private final double maxMuBinAbsoluteDeviation;
@@ -232,8 +225,7 @@ public class CosineSphereDirections {
                 int directionsBelowHemisphere,
                 double maxLengthDeviation,
                 double minDotWithNormal,
-                double meanMu,
-                double meanMuDeviationFromExpected,
+                double meanResultantLength,
                 int[] muBinCounts,
                 double[] expectedMuBinCounts,
                 double maxMuBinAbsoluteDeviation,
@@ -243,8 +235,7 @@ public class CosineSphereDirections {
             this.directionsBelowHemisphere = directionsBelowHemisphere;
             this.maxLengthDeviation = maxLengthDeviation;
             this.minDotWithNormal = minDotWithNormal;
-            this.meanMu = meanMu;
-            this.meanMuDeviationFromExpected = meanMuDeviationFromExpected;
+            this.meanResultantLength = meanResultantLength;
             this.muBinCounts = Arrays.copyOf(muBinCounts, muBinCounts.length);
             this.expectedMuBinCounts = Arrays.copyOf(expectedMuBinCounts, expectedMuBinCounts.length);
             this.maxMuBinAbsoluteDeviation = maxMuBinAbsoluteDeviation;

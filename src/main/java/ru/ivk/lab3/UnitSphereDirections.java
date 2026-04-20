@@ -1,6 +1,7 @@
 package ru.ivk.lab3;
 
 import ru.ivk.common.math.Vec3;
+import ru.ivk.common.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,7 @@ public class UnitSphereDirections {
         double xiPhi = random.nextDouble();
 
         double phi = 2.0 * Math.PI * xiPhi;
-        double cosTheta = clamp(2.0 * xiTheta - 1.0, -1.0, 1.0);
+        double cosTheta = Utils.clamp(2.0 * xiTheta - 1.0, -1.0, 1.0);
         double theta = Math.acos(cosTheta);
         double sinTheta = Math.sin(theta);
 
@@ -70,7 +71,7 @@ public class UnitSphereDirections {
             sumY += direction.y;
             sumZ += direction.z;
 
-            double mu = clamp(direction.dot(nAxis), -1.0, 1.0);
+            double mu = Utils.clamp(direction.dot(nAxis), -1.0, 1.0);
             int muBinIndex = mapMuToBinIndex(mu);
             muBinCounts[muBinIndex]++;
         }
@@ -137,10 +138,6 @@ public class UnitSphereDirections {
         }
 
         return muBinIndex;
-    }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
     }
 
     public static final class ValidationResult {
