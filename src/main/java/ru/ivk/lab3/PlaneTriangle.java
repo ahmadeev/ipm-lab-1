@@ -79,8 +79,8 @@ public class PlaneTriangle {
             double maxSign = Math.max(s1, Math.max(s2, s3));
             boolean isInside = minSign >= -edgeTolerance || maxSign <= edgeTolerance;
             double edgeViolation = Math.min(
-                    Math.max(0.0, -minSign - edgeTolerance),
-                    Math.max(0.0, maxSign - edgeTolerance)
+                    Math.max(0.0, -minSign - edgeTolerance), // как сильно в '-'
+                    Math.max(0.0, maxSign - edgeTolerance) // как сильно в '+'
             );
 
             maxEdgeViolation = Math.max(maxEdgeViolation, edgeViolation);
