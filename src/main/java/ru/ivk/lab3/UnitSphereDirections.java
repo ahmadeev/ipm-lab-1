@@ -101,14 +101,14 @@ public class UnitSphereDirections {
     }
 
     public void printReport(List<Vec3> directions, int previewCount) {
-        System.out.println("Uniform directions on unit sphere");
+        System.out.println("Равномерные направления на единичной сфере");
         System.out.printf("U = %s%n", uAxis);
         System.out.printf("V = %s%n", vAxis);
         System.out.printf("N = %s%n", nAxis);
-        System.out.printf("Generated directions: %d%n", directions.size());
+        System.out.printf("Сгенерировано направлений: %d%n", directions.size());
 
         System.out.println();
-        System.out.println("First directions:");
+        System.out.println("Первые направления:");
 
         for (int i = 0; i < Math.min(previewCount, directions.size()); i++) {
             System.out.printf("%d. %s%n", i + 1, directions.get(i));
@@ -118,14 +118,14 @@ public class UnitSphereDirections {
     }
 
     public void printValidationReport(ValidationResult validation) {
-        System.out.println("Validation:");
-        System.out.printf("Directions off unit sphere: %d%n", validation.directionsOffUnitSphere);
-        System.out.printf("Max length deviation from 1: %.12f%n", validation.maxLengthDeviation);
-        System.out.printf("Mean resultant length: %.12f%n", validation.meanResultantLength);
-        System.out.printf("Expected count per mu-bin: %.2f%n", validation.expectedMuBinCount);
-        System.out.printf("mu-bin counts: %s%n", Arrays.toString(validation.muBinCounts));
-        System.out.printf("Max absolute mu-bin deviation: %.2f%n", validation.maxMuBinAbsoluteDeviation);
-        System.out.printf("Max relative mu-bin deviation: %.6f%n", validation.maxMuBinRelativeDeviation);
+        System.out.println("Проверка:");
+        System.out.printf("Направлений вне единичной сферы: %d%n", validation.directionsOffUnitSphere);
+        System.out.printf("Макс. отклонение длины от 1: %.12f%n", validation.maxLengthDeviation);
+        System.out.printf("Средняя длина результирующего вектора: %.12f%n", validation.meanResultantLength);
+        System.out.printf("Ожидаемое число в каждом mu-бине: %.2f%n", validation.expectedMuBinCount);
+        System.out.printf("Числа по mu-бинам: %s%n", Arrays.toString(validation.muBinCounts));
+        System.out.printf("Макс. абсолютное отклонение по mu-бинам: %.2f%n", validation.maxMuBinAbsoluteDeviation);
+        System.out.printf("Макс. относительное отклонение по mu-бинам: %.6f%n", validation.maxMuBinRelativeDeviation);
         System.out.println();
     }
 

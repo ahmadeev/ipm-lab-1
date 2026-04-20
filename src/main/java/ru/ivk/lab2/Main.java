@@ -193,12 +193,12 @@ public class Main {
     private static void printHeader() {
         System.out.println("==================================================================================================================");
         System.out.printf("%-30s %10s %16s %18s %18s %18s%n",
-                "Method",
+                "Метод",
                 "N",
-                "Exact",
-                "Value",
-                "Error",
-                "Est. Error");
+                "Точное",
+                "Оценка",
+                "Ошибка",
+                "Оц. ошибка");
         System.out.println("==================================================================================================================");
     }
 
@@ -250,17 +250,17 @@ public class Main {
 
             System.out.printf("Оценка погрешности: %.6f%n", exact / Math.sqrt(N));
 
-            printRow("Simple MC", sampleCount, exact, simple);
-            printRow("Stratified (step=1)", sampleCount, exact, strat1);
-            printRow("Stratified (step=0.5)", sampleCount, exact, strat05);
-            printRow("Importance (p(x)=x)", sampleCount, exact, imp1);
-            printRow("Importance (p(x)=x^2)", sampleCount, exact, imp2);
-            printRow("Importance (p(x)=x^3)", sampleCount, exact, imp3);
-            printRow("MIS balance", sampleCount, exact, multi1);
-            printRow("MIS power(beta=2)", sampleCount, exact, multi2);
-            printRow("Russian roulette (R=0.5)", sampleCount, exact, rr05);
-            printRow("Russian roulette (R=0.75)", sampleCount, exact, rr075);
-            printRow("Russian roulette (R=0.95)", sampleCount, exact, rr095);
+            printRow("Простой МК", sampleCount, exact, simple);
+            printRow("МК со стратификацией (шаг=1)", sampleCount, exact, strat1);
+            printRow("МК со стратификацией (шаг=0.5)", sampleCount, exact, strat05);
+            printRow("Выборка по важности (p(x)=x)", sampleCount, exact, imp1);
+            printRow("Выборка по важности (p(x)=x^2)", sampleCount, exact, imp2);
+            printRow("Выборка по важности (p(x)=x^3)", sampleCount, exact, imp3);
+            printRow("Многократная выборка по значимости, баланс", sampleCount, exact, multi1);
+            printRow("Многократная выборка по значимости, степень (beta=2)", sampleCount, exact, multi2);
+            printRow("Русская рулетка (R=0.5)", sampleCount, exact, rr05);
+            printRow("Русская рулетка (R=0.75)", sampleCount, exact, rr075);
+            printRow("Русская рулетка (R=0.95)", sampleCount, exact, rr095);
 
             System.out.println("------------------------------------------------------------------------------------------------------------------");
         }

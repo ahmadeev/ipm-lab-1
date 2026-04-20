@@ -52,14 +52,14 @@ public class Main {
 
         /* COSINE HEMISPHERE */
 
-        CosineHemisphereDirections cosineHemisphereDirections =
-                new CosineHemisphereDirections(HEMISPHERE_CENTER, HEMISPHERE_NORMAL);
+        CosineSphereDirections cosineSphereDirections =
+                new CosineSphereDirections(HEMISPHERE_CENTER, HEMISPHERE_NORMAL);
 
-        List<Vec3> cosineDirections = cosineHemisphereDirections.generateCosineDirections(SAMPLE_COUNT);
-        cosineHemisphereDirections.printReport(cosineDirections, PREVIEW_COUNT);
+        List<Vec3> cosineDirections = cosineSphereDirections.generateCosineDirections(SAMPLE_COUNT);
+        cosineSphereDirections.printReport(cosineDirections, PREVIEW_COUNT);
 
-        CosineHemisphereDirections.ValidationResult cosineValidation =
-                cosineHemisphereDirections.validateDirections(cosineDirections);
-        cosineHemisphereDirections.printValidationReport(cosineValidation);
+        CosineSphereDirections.ValidationResult cosineValidation =
+                cosineSphereDirections.validateDirections(cosineDirections);
+        cosineSphereDirections.printValidationReport(cosineValidation);
     }
 }

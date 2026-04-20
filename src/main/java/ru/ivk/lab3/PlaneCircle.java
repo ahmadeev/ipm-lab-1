@@ -123,14 +123,14 @@ public class PlaneCircle {
     }
 
     public void printReport(List<Vec3> points, int previewCount) {
-        System.out.println("Uniform points inside circle");
+        System.out.println("Равномерное распределение точек внутри круга");
         System.out.printf("C = %s%n", circleCenter);
         System.out.printf("N = %s%n", circleNormal);
         System.out.printf("Rc = %.4f%n", circleRadius);
-        System.out.printf("Generated points: %d%n", points.size());
+        System.out.printf("Сгенерировано точек: %d%n", points.size());
 
         System.out.println();
-        System.out.println("First points:");
+        System.out.println("Первые точки:");
 
         for (int i = 0; i < Math.min(previewCount, points.size()); i++) {
             System.out.printf("%d. %s%n", i + 1, points.get(i));
@@ -140,11 +140,11 @@ public class PlaneCircle {
     }
 
     public void printValidationReport(ValidationResult validation) {
-        System.out.println("Validation:");
-        System.out.printf("Points off circle plane: %d%n", validation.pointsOffPlane);
-        System.out.printf("Points outside circle by radial check: %d%n", validation.pointsOutsideCircle);
-        System.out.printf("Max distance to circle plane: %.12f%n", validation.maxPlaneDistance);
-        System.out.printf("Max circle radial overshoot: %.12f%n", validation.maxRadialOvershoot);
+        System.out.println("Проверка:");
+        System.out.printf("Точек вне плоскости круга: %d%n", validation.pointsOffPlane);
+        System.out.printf("Точек вне круга: %d%n", validation.pointsOutsideCircle);
+        System.out.printf("Макс. расстояние до плоскости круга: %.12f%n", validation.maxPlaneDistance);
+        System.out.printf("Макс. выход за радиус круга: %.12f%n", validation.maxRadialOvershoot);
         System.out.println();
     }
 

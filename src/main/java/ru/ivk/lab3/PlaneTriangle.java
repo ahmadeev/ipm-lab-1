@@ -99,14 +99,14 @@ public class PlaneTriangle {
     }
 
     public void printReport(List<Vec3> points, int previewCount) {
-        System.out.println("Uniform points inside triangle");
+        System.out.println("Равномерное распределение точек внутри треугольника");
         System.out.printf("V1 = %s%n", vertex1);
         System.out.printf("V2 = %s%n", vertex2);
         System.out.printf("V3 = %s%n", vertex3);
-        System.out.printf("Generated points: %d%n", points.size());
+        System.out.printf("Сгенерировано точек: %d%n", points.size());
 
         System.out.println();
-        System.out.println("First points:");
+        System.out.println("Первые точки:");
 
         for (int i = 0; i < Math.min(previewCount, points.size()); i++) {
             System.out.printf("%d. %s%n", i + 1, points.get(i));
@@ -116,11 +116,11 @@ public class PlaneTriangle {
     }
 
     public void printValidationReport(ValidationResult validation) {
-        System.out.println("Validation:");
-        System.out.printf("Points off triangle plane: %d%n", validation.pointsOffPlane);
-        System.out.printf("Points outside triangle by edge test: %d%n", validation.pointsOutsideTriangle);
-        System.out.printf("Max distance to triangle plane: %.12f%n", validation.maxPlaneDistance);
-        System.out.printf("Max triangle edge violation: %.12f%n", validation.maxEdgeViolation);
+        System.out.println("Проверка:");
+        System.out.printf("Точек вне плоскости треугольника: %d%n", validation.pointsOffPlane);
+        System.out.printf("Точек вне треугольника: %d%n", validation.pointsOutsideTriangle);
+        System.out.printf("Макс. расстояние до плоскости треугольника: %.12f%n", validation.maxPlaneDistance);
+        System.out.printf("Макс. нарушение по рёбрам треугольника: %.12f%n", validation.maxEdgeViolation);
         System.out.println();
     }
 
