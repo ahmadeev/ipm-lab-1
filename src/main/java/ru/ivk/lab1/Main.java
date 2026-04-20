@@ -28,7 +28,7 @@ public class Main {
         ));
 
         // ---- Наблюдатель ----
-        Vec3 observer = new Vec3(2, 2, -8);
+        Vec3 observer = new Vec3(2, 2, 8);
 
         // ---- Параметры материала ----
         double kd = 0.5; // коэффициент диффузного отражения
@@ -90,13 +90,7 @@ public class Main {
         // ---- Нормаль ----
         Vec3 N = C.sub(A).cross(B.sub(A)).normalize();
 
-        if (isLocal) {
-            System.out.printf("| %-7s | %-7s || %-7s | %-7s | %-7s || %-28s | %-28s |%n", "u", "v", "x", "y", "z", "E (освещенность)", "L (яркость)");
-            System.out.printf("|---------|---------||---------|---------|---------||------------------------------|------------------------------|%n");
-        } else {
-            System.out.printf("| %-7s | %-7s | %-7s || %-28s | %-28s |%n", "x", "y", "z", "E (освещенность)", "L (яркость)");
-            System.out.printf("|---------|---------|---------||------------------------------|------------------------------|%n");
-        }
+        printHeader(isLocal);
 
         for (Double[] lp : points) {
             double u = lp[0];
@@ -126,8 +120,8 @@ public class Main {
 
                 Vec3 brightnessFactor = E.mul(brdf);
 
-//                if (N.dot(V) > 0 && N.dot(s) > 0 || N.dot(V) < 0 && N.dot(s) < 0) {
-                if (s.dot(V) > 0) {
+                if (N.dot(V) > 0 && N.dot(s) > 0 || N.dot(V) < 0 && N.dot(s) < 0) {
+//                if (s.dot(V) > 0) {
                     totalBrightness = totalBrightness.add(
                             new Vec3(
                                     K.x * brightnessFactor.x,
@@ -178,5 +172,15 @@ public class Main {
         }
 
         return result.toArray(new Double[0][2]);
+    }
+
+    private static void printHeader(boolean isLocal) {
+        if (isLocal) {
+            System.out.printf("| %-7s | %-7s || %-7s | %-7s | %-7s || %-28s | %-28s |%n", "u", "v", "x", "y", "z", "E (освещенность)", "L (яркость)");
+            System.out.printf("|---------|---------||---------|---------|---------||------------------------------|------------------------------|%n");
+        } else {
+            System.out.printf("| %-7s | %-7s | %-7s || %-28s | %-28s |%n", "x", "y", "z", "E (освещенность)", "L (яркость)");
+            System.out.printf("|---------|---------|---------||------------------------------|------------------------------|%n");
+        }
     }
 }
