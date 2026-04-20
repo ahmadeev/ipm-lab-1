@@ -1,6 +1,6 @@
-references/
-tasks/
-plans/
+helpers/references/
+helpers/tasks/
+helpers/plans/
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
