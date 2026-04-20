@@ -43,7 +43,6 @@ public class CosineSphereDirections {
         Vec3 combined = sphereNormal.add(uniformDirection);
         double combinedLength = combined.length();
 
-        // The antipodal case P = -N is vanishingly rare; keep the result in the hemisphere if it happens.
         if (combinedLength <= EPSILON) {
             return copyOf(sphereNormal);
         }
