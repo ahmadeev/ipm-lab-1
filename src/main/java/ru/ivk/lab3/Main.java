@@ -15,6 +15,8 @@ public class Main {
     private static final Vec3 CIRCLE_CENTER = new Vec3(2, -1, 3);
     private static final Vec3 CIRCLE_NORMAL = new Vec3(2, 3, 4).normalize();
     private static final double CIRCLE_RADIUS = 3.5;
+    private static final Vec3 HEMISPHERE_CENTER = new Vec3(2, -1, 3);
+    private static final Vec3 HEMISPHERE_NORMAL = new Vec3(2, 3, 4).normalize();
 
     public static void main(String[] args) {
         /* TRIANGLE */
@@ -47,5 +49,17 @@ public class Main {
         UnitSphereDirections.ValidationResult sphereValidation =
                 unitSphereDirections.validateDirections(sphereDirections);
         unitSphereDirections.printValidationReport(sphereValidation);
+
+        /* COSINE HEMISPHERE */
+
+        CosineHemisphereDirections cosineHemisphereDirections =
+                new CosineHemisphereDirections(HEMISPHERE_CENTER, HEMISPHERE_NORMAL);
+
+        List<Vec3> cosineDirections = cosineHemisphereDirections.generateCosineDirections(SAMPLE_COUNT);
+        cosineHemisphereDirections.printReport(cosineDirections, PREVIEW_COUNT);
+
+        CosineHemisphereDirections.ValidationResult cosineValidation =
+                cosineHemisphereDirections.validateDirections(cosineDirections);
+        cosineHemisphereDirections.printValidationReport(cosineValidation);
     }
 }
