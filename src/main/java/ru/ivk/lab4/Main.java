@@ -2,7 +2,9 @@ package ru.ivk.lab4;
 
 import ru.ivk.lab4.cli.ConsoleInput;
 import ru.ivk.lab4.core.RenderSettings;
+import ru.ivk.lab4.image.ImageBuffer;
 import ru.ivk.lab4.image.NormalizationMode;
+import ru.ivk.lab4.image.PngWriter;
 import ru.ivk.lab4.image.PpmWriter;
 import ru.ivk.lab4.render.Renderer;
 import ru.ivk.lab4.scene.DemoSceneFactory;
@@ -10,6 +12,7 @@ import ru.ivk.lab4.scene.ObjSceneFactory;
 import ru.ivk.lab4.scene.RenderJob;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Scanner;
@@ -88,15 +91,45 @@ public class Main {
                 settings.getThreadCount()
         );
 
+        ImageBuffer image = new Renderer().render(job.getScene(), job.getCamera(), settings);
+        Path ppmPath = Paths.get(settings.getOutputPath());
+        Path pngPath = toPngPath(ppmPath);
+
         PpmWriter.write(
-                new Renderer().render(job.getScene(), job.getCamera(), settings),
-                Paths.get(settings.getOutputPath()),
+                image,
+                ppmPath,
                 settings.getNormalizationMode(),
                 settings.getFixedExposure(),
                 settings.getGamma()
         );
 
-        System.out.printf("Saved: %s%n", settings.getOutputPath());
+        PngWriter.write(
+                image,
+                pngPath,
+                settings.getNormalizationMode(),
+                settings.getFixedExposure(),
+                settings.getGamma()
+        );
+
+        System.out.printf("Saved: %s%n", ppmPath);
+        System.out.printf("Saved: %s%n", pngPath);
+    }
+
+    private static Path toPngPath(Path ppmPath) {
+        Path fileNamePath = ppmPath.getFileName();
+
+        if (fileNamePath == null) {
+            return Paths.get("output.png");
+        }
+
+        String fileName = fileNamePath.toString();
+        int dotIndex = fileName.lastIndexOf('.');
+        String pngFileName = dotIndex >= 0
+                ? fileName.substring(0, dotIndex) + ".png"
+                : fileName + ".png";
+        Path parent = ppmPath.getParent();
+
+        return parent == null ? Paths.get(pngFileName) : parent.resolve(pngFileName);
     }
 
     private static void printUsage() {
