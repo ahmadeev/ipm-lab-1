@@ -1,7 +1,9 @@
 package ru.ivk.lab4.core;
 
+import lombok.Getter;
 import ru.ivk.lab4.image.NormalizationMode;
 
+@Getter
 public final class RenderSettings {
     private final int width;
     private final int height;
@@ -68,39 +70,4 @@ public final class RenderSettings {
         );
     }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getSamplesPerPixel() {
-        return samplesPerPixel;
-    }
-
-    public int getMaxDepth() {
-        return maxDepth;
-    }
-
-    public double getGamma() {
-        return gamma;
-    }
-
-    public String getOutputPath() {
-        return outputPath;
-    }
-
-    public NormalizationMode getNormalizationMode() {
-        return normalizationMode;
-    }
-
-    public double getFixedExposure() {
-        return fixedExposure;
-    }
-
-    public int getThreadCount() {
-        return threadCount;
-    }
 }

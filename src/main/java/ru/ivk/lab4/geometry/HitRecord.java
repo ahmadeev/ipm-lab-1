@@ -1,12 +1,15 @@
 package ru.ivk.lab4.geometry;
 
+import lombok.Getter;
 import ru.ivk.common.math.Vec3;
 import ru.ivk.lab4.material.Material;
 
 public final class HitRecord {
     private final Vec3 point;
     private final Vec3 normal;
+    @Getter
     private final double t;
+    @Getter
     private final Triangle triangle;
 
     public HitRecord(Vec3 point, Vec3 normal, double t, Triangle triangle) {
@@ -22,14 +25,6 @@ public final class HitRecord {
 
     public Vec3 getNormal() {
         return Vec3.copyOf(normal);
-    }
-
-    public double getT() {
-        return t;
-    }
-
-    public Triangle getTriangle() {
-        return triangle;
     }
 
     public Material getMaterial() {

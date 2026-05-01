@@ -1,7 +1,9 @@
 package ru.ivk.lab4.material;
 
+import lombok.Getter;
 import ru.ivk.lab4.core.ColorRgb;
 
+@Getter
 public final class Material {
     private final ColorRgb diffuse;
     private final ColorRgb specular;
@@ -29,18 +31,6 @@ public final class Material {
 
     public static Material light(ColorRgb emission) {
         return new Material(ColorRgb.BLACK, ColorRgb.BLACK, emission);
-    }
-
-    public ColorRgb getDiffuse() {
-        return diffuse;
-    }
-
-    public ColorRgb getSpecular() {
-        return specular;
-    }
-
-    public ColorRgb getEmission() {
-        return emission;
     }
 
     public boolean isLight() {

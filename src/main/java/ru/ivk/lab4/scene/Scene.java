@@ -1,5 +1,6 @@
 package ru.ivk.lab4.scene;
 
+import lombok.Getter;
 import ru.ivk.lab4.core.Ray;
 import ru.ivk.lab4.geometry.HitRecord;
 import ru.ivk.lab4.geometry.Triangle;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
 public final class Scene {
     private final List<Triangle> triangles;
     private final List<Triangle> lights;
@@ -45,13 +47,5 @@ public final class Scene {
 
     public boolean isOccluded(Ray ray, double tMin, double tMax) {
         return intersect(ray, tMin, tMax).isPresent();
-    }
-
-    public List<Triangle> getTriangles() {
-        return triangles;
-    }
-
-    public List<Triangle> getLights() {
-        return lights;
     }
 }

@@ -1,9 +1,12 @@
 package ru.ivk.lab4.image;
 
+import lombok.Getter;
 import ru.ivk.lab4.core.ColorRgb;
 
 public final class ImageBuffer {
+    @Getter
     private final int width;
+    @Getter
     private final int height;
     private final ColorRgb[] pixels;
 
@@ -19,14 +22,6 @@ public final class ImageBuffer {
         for (int i = 0; i < pixels.length; i++) {
             pixels[i] = ColorRgb.BLACK;
         }
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public void setPixel(int x, int y, ColorRgb color) {
