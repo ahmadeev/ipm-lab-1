@@ -1,5 +1,6 @@
 package ru.ivk.lab2;
 
+import java.util.Locale;
 import java.util.Random;
 
 // MonteCarloIntegration
@@ -216,6 +217,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        Locale.setDefault(Locale.US);
+
         double a = 2;
         double b = 5;
 

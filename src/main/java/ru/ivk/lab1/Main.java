@@ -6,68 +6,64 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+    // ---- Треугольник ----
+    private final static Vec3 A = new Vec3(0, 0, 0); // P_0
+    private final static Vec3 B = new Vec3(2, 0, 0); // P_1
+    private final static Vec3 C = new Vec3(0, 2, 5); // P_2
+
+    // ---- Источники света ----
+    private final static List<Light> LIGHTS = new ArrayList<>(List.of(
+            new Light(
+                    new Vec3(5, -5, 2), // расположение
+                    new Vec3(-0.333333333333333, 0.666666666666666, -0.666666666666666), // направление
+                    new Vec3(1500, 1500, 0) // I_0
+            ),
+            new Light(
+                    new Vec3(0, 2, 15), // расположение
+                    new Vec3(0, 0, -1), // направление
+                    new Vec3(1000, 1000, 1000) // I_0
+            )
+    ));
+
+    // ---- Наблюдатель ----
+    private final static Vec3 OBSERVER = new Vec3(2, 2, 8);
+
+    // ---- Параметры материала ----
+    private final static double KD = 0.5; // коэффициент диффузного отражения
+    private final static double KS = 0.5; // коэффициент зеркального отражения
+    private final static double KE = 200; // коэффициент, определяющий ширину блика
+
+    private final static Vec3 K = new Vec3(1, 0, 0); // цвет поверхности
+
+    // ---- Локальные координаты (отметки) ----
+    private final static Double[] LOCAL_XS = new Double[]{-100.0, 0.0, 2.0, 5.0, 10.0};
+    private final static Double[] LOCAL_YS = {-100.0, 0.0, 2.0, 15.0, 100.0};
+
+    // ---- Глобальные точки ----
+    private final static Double[][] GLOBAL_POINTS = {
+            {-100.0, -37.14, -92.85},
+            {0.0, 0.0, 0.0},
+            {2.0, 0.74, 1.86},
+            {5.0, 5.57, 13.93},
+            {10.0, 37.14, 92.85}
+    };
+
     public static void main( String[] args ) {
-        // ---- Треугольник ----
-        Vec3 A = new Vec3(0, 0, 0); // P_0
-        Vec3 B = new Vec3(2, 0, 0); // P_1
-        Vec3 C = new Vec3(0, 2, 5); // P_2
-
-        // ---- Источники света ----
-        List<Light> lights = new ArrayList<>();
-
-/*        lights.add(new Light(
-                new Vec3(5, -5, 2), // расположение
-                new Vec3(-0.333333333333333, 0.666666666666666, -0.666666666666666), // направление
-                new Vec3(1500, 1500, 0) // I_0
-        ));*/
-
-        lights.add(new Light(
-                new Vec3(0, 2, 15), // расположение
-                new Vec3(0, 0, -1), // направление
-                new Vec3(1000, 1000, 1000) // I_0
-        ));
-
-        // ---- Наблюдатель ----
-        Vec3 observer = new Vec3(2, 2, 8);
-
-        // ---- Параметры материала ----
-        double kd = 0.5; // коэффициент диффузного отражения
-        double ks = 0.5; // коэффициент зеркального отражения
-        double ke = 200; // коэффициент, определяющий ширину блика
-
-        Vec3 K = new Vec3(1, 0, 0); // цвет поверхности
-
-        // ---- Локальные точки ----
-        Double[] localXs = new Double[]{-100.0, 0.0, 2.0, 5.0, 10.0};
-        Double[] localYs = {-100.0, 0.0, 2.0, 15.0, 100.0};
-
-//        Double[] localXs = new Double[]{0.0};
-//        Double[] localYs = {0.0, 15.0};
-
-        Double[][] localPoints = generateSeries(localXs, localYs);
+        Double[][] localPoints = generateSeries(LOCAL_XS, LOCAL_YS);
 
         compute(
                 localPoints,
                 true,
-                lights,
+                LIGHTS,
                 A, B, C,
-                observer,
-                K, kd, ks, ke
+                OBSERVER,
+                K, KD, KS, KE
         );
-
-        // ---- Глобальные точки ----
-        Double[][] globalPoints = {
-                {-100.0, -37.14, -92.85},
-                {0.0, 0.0, 0.0},
-                {2.0, 0.74, 1.86},
-                {5.0, 5.57, 13.93},
-                {10.0, 37.14, 92.85}
-        };
 
 /*        compute(
                 globalPoints,
                 false,
-                lights,
+                LIGHTS,
                 A, B, C,
                 observer,
                 K, kd, ks, ke
@@ -121,7 +117,6 @@ public class Main {
                 Vec3 brightnessFactor = E.mul(brdf);
 
                 if (N.dot(V) > 0 && N.dot(s) > 0 || N.dot(V) < 0 && N.dot(s) < 0) {
-//                if (s.dot(V) > 0) {
                     totalBrightness = totalBrightness.add(
                             new Vec3(
                                     K.x * brightnessFactor.x,
