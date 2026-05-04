@@ -31,7 +31,7 @@ public final class DemoSceneFactory {
 
         double aspectRatio = settings.getWidth() / (double) settings.getHeight();
         Camera camera = new Camera(
-                new Vec3(0.0, 1.35, -5.0),
+                new Vec3(3.0, 2.35, -5.0), // 0.0, 1.35, -5.0
                 new Vec3(0.0, 1.05, 0.5),
                 new Vec3(0.0, 1.0, 0.0),
                 42.0,
