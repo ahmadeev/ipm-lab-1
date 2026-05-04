@@ -30,10 +30,11 @@ public final class DemoSceneFactory {
         addQuad(triangles, new Vec3(-0.8, 2.85, 0.1), new Vec3(0.8, 2.85, 0.1), new Vec3(0.8, 2.85, 1.1), new Vec3(-0.8, 2.85, 1.1), light);
 
         double aspectRatio = settings.getWidth() / (double) settings.getHeight();
+        // x -- вправо, y -- вверх, z -- вглубь
         Camera camera = new Camera(
-                new Vec3(3.0, 2.35, -5.0), // 0.0, 1.35, -5.0
+                new Vec3(3.0, 2.35, -5.0), // 0.0 (left/right), 1.35 (down/up), -5.0 (close/far)
                 new Vec3(0.0, 1.05, 0.5),
-                new Vec3(0.0, 1.0, 0.0),
+                new Vec3(0.0, 1.0, 0.0), // если -y, то изображение перевернуто
                 42.0,
                 aspectRatio
         );
