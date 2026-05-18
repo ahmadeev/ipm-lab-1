@@ -45,8 +45,8 @@ public final class PathTracer {
         }
 
         // расчет света
-        return directLighting(scene, hit.get(), material, sampler);
-                //.add(indirectBounce(scene, ray, hit.get(), material, sampler, depth, russianRouletteStartDepth, bounce));
+        return directLighting(scene, hit.get(), material, sampler)
+                .add(indirectBounce(scene, ray, hit.get(), material, sampler, depth, russianRouletteStartDepth, bounce));
     }
 
     private ColorRgb directLighting(Scene scene, HitRecord hit, Material material, Sampler sampler) {
