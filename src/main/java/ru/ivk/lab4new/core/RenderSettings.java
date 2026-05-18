@@ -88,7 +88,7 @@ public final class RenderSettings {
         return new RenderSettings(
                 500,
                 500,
-                8,
+                24,
                 8,
                 4,
                 Math.max(1, Runtime.getRuntime().availableProcessors() - 1),

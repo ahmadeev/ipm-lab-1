@@ -144,6 +144,8 @@ public final class PathTracer {
     }
 
     private ColorRgb directionColor(Vec3 direction) {
+        // return ColorRgb.BLACK;
+
         Vec3 unit = direction.normalize();
 
         return new ColorRgb(
