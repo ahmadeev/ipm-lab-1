@@ -19,7 +19,11 @@ public final class PathTracer {
     private static final double EPSILON = 1e-4;
     private final LightSampler lightSampler = new LightSampler();
 
-    public ColorRgb trace(Scene scene, Ray ray, Sampler sampler) {
+    public ColorRgb trace(Scene scene, Ray ray, Sampler sampler, int depth) {
+        if (depth <= 0) {
+            return ColorRgb.BLACK;
+        }
+
         Optional<HitRecord> hit = scene.intersect(ray, EPSILON, Double.POSITIVE_INFINITY);
 
         // пересечение не найдено
@@ -35,7 +39,8 @@ public final class PathTracer {
         }
 
         // расчет света
-        return directLighting(scene, hit.get(), material, sampler);
+        return directLighting(scene, hit.get(), material, sampler)
+                .add(indirectDiffuse(scene, hit.get(), material, sampler, depth));
     }
 
     private ColorRgb directLighting(Scene scene, HitRecord hit, Material material, Sampler sampler) {
@@ -72,6 +77,19 @@ public final class PathTracer {
 
         double geometry = surfaceCos * lightCos / distanceSquared;
         return material.getDiffuse().mul(light.getEmission()).mul(geometry / (Math.PI * light.getPdf()));
+    }
+
+    private ColorRgb indirectDiffuse(Scene scene, HitRecord hit, Material material, Sampler sampler, int depth) {
+        if (depth <= 1 || material.getDiffuse().isBlack()) {
+            return ColorRgb.BLACK;
+        }
+
+        Vec3 hitPoint = hit.getPoint();
+        Vec3 hitNormal = hit.getNormal();
+        Vec3 direction = sampler.sampleCosineHemisphere(hitNormal);
+        Ray bounceRay = new Ray(hitPoint.add(hitNormal.mul(EPSILON)), direction);
+
+        return material.getDiffuse().mul(trace(scene, bounceRay, sampler, depth - 1));
     }
 
     private ColorRgb directionColor(Vec3 direction) {

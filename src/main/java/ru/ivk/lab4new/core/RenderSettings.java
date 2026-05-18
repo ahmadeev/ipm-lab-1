@@ -52,7 +52,7 @@ public final class RenderSettings {
         return new RenderSettings(
                 500,
                 500,
-                1,
+                2,
                 1,
                 2.2,
                 "helpers/output/lab-4new/demo.ppm"

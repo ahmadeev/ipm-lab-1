@@ -1,5 +1,7 @@
 package ru.ivk.lab4new.sampling;
 
+import ru.ivk.common.math.Vec3;
+
 import java.util.Random;
 
 /**
@@ -47,5 +49,25 @@ public final class Sampler {
         }
 
         return weights.length - 1;
+    }
+
+    public Vec3 sampleCosineHemisphere(Vec3 normal) {
+        Vec3 unitNormal = normal.normalize();
+        Vec3 helper = Math.abs(unitNormal.x) > 0.9
+                ? new Vec3(0.0, 1.0, 0.0)
+                : new Vec3(1.0, 0.0, 0.0);
+        Vec3 tangent = helper.cross(unitNormal).normalize();
+        Vec3 bitangent = unitNormal.cross(tangent).normalize();
+        double radiusSquared = nextDouble();
+        double radius = Math.sqrt(radiusSquared);
+        double angle = 2.0 * Math.PI * nextDouble(); // [0, 2 * pi)
+        double x = radius * Math.cos(angle);
+        double y = radius * Math.sin(angle);
+        double z = Math.sqrt(1.0 - radiusSquared);
+
+        return tangent.mul(x)
+                .add(bitangent.mul(y))
+                .add(unitNormal.mul(z))
+                .normalize();
     }
 }
