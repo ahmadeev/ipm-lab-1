@@ -27,7 +27,13 @@ public final class Renderer {
                     double v = (y + sampler.nextDouble()) / settings.getHeight();
                     Ray ray = camera.ray(u, v);
 
-                    color = color.add(pathTracer.trace(scene, ray, sampler, settings.getMaxDepth()));
+                    color = color.add(pathTracer.trace(
+                            scene,
+                            ray,
+                            sampler,
+                            settings.getMaxDepth(),
+                            settings.getRussianRouletteStartDepth()
+                    ));
                 }
 
                 image.setPixel(x, y, color.div(settings.getSamplesPerPixel()));

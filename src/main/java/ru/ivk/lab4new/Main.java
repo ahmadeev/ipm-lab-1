@@ -30,11 +30,12 @@ public class Main {
         RenderJob job = ObjSceneFactory.create(settings);
 
         System.out.printf(
-                "Render: %dx%d, spp=%d, maxDepth=%d, model=%s, output=%s%n",
+                "Render: %dx%d, spp=%d, maxDepth=%d, rrStart=%d, model=%s, output=%s%n",
                 job.getSettings().getWidth(),
                 job.getSettings().getHeight(),
                 job.getSettings().getSamplesPerPixel(),
                 job.getSettings().getMaxDepth(),
+                job.getSettings().getRussianRouletteStartDepth(),
                 job.getSettings().getModelPath(),
                 job.getSettings().getOutputPath()
         );

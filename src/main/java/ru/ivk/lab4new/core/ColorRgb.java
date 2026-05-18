@@ -40,6 +40,10 @@ public final class ColorRgb {
         return (r + g + b) / 3.0;
     }
 
+    public double maxComponent() {
+        return Math.max(r, Math.max(g, b));
+    }
+
     public boolean isBlack() {
         return r == 0.0 && g == 0.0 && b == 0.0;
     }

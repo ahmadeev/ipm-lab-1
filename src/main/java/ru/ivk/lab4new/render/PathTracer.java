@@ -17,9 +17,15 @@ import java.util.Optional;
  */
 public final class PathTracer {
     private static final double EPSILON = 1e-4;
+    private static final double MIN_SURVIVAL_PROBABILITY = 0.1;
+    private static final double MAX_SURVIVAL_PROBABILITY = 0.95;
     private final LightSampler lightSampler = new LightSampler();
 
-    public ColorRgb trace(Scene scene, Ray ray, Sampler sampler, int depth) {
+    public ColorRgb trace(Scene scene, Ray ray, Sampler sampler, int depth, int russianRouletteStartDepth) {
+        return trace(scene, ray, sampler, depth, russianRouletteStartDepth, 0);
+    }
+
+    private ColorRgb trace(Scene scene, Ray ray, Sampler sampler, int depth, int russianRouletteStartDepth, int bounce) {
         if (depth <= 0) {
             return ColorRgb.BLACK;
         }
@@ -40,7 +46,7 @@ public final class PathTracer {
 
         // расчет света
         return directLighting(scene, hit.get(), material, sampler)
-                .add(indirectBounce(scene, ray, hit.get(), material, sampler, depth));
+                .add(indirectBounce(scene, ray, hit.get(), material, sampler, depth, russianRouletteStartDepth, bounce));
     }
 
     private ColorRgb directLighting(Scene scene, HitRecord hit, Material material, Sampler sampler) {
@@ -79,7 +85,16 @@ public final class PathTracer {
         return material.getDiffuse().mul(light.getEmission()).mul(geometry / (Math.PI * light.getPdf()));
     }
 
-    private ColorRgb indirectBounce(Scene scene, Ray ray, HitRecord hit, Material material, Sampler sampler, int depth) {
+    private ColorRgb indirectBounce(
+            Scene scene,
+            Ray ray,
+            HitRecord hit,
+            Material material,
+            Sampler sampler,
+            int depth,
+            int russianRouletteStartDepth,
+            int bounce
+    ) {
         if (depth <= 1) {
             return ColorRgb.BLACK;
         }
@@ -102,9 +117,30 @@ public final class PathTracer {
         ColorRgb coefficient = event == 0
                 ? material.getDiffuse()
                 : material.getSpecular();
+        double survivalProbability = survivalProbability(material, bounce, russianRouletteStartDepth);
+
+        if (survivalProbability < 1.0 && sampler.nextDouble() >= survivalProbability) {
+            return ColorRgb.BLACK;
+        }
+
         Ray bounceRay = new Ray(hitPoint.add(hitNormal.mul(EPSILON)), direction);
 
-        return coefficient.mul(trace(scene, bounceRay, sampler, depth - 1)).div(eventPdf);
+        return coefficient
+                .mul(trace(scene, bounceRay, sampler, depth - 1, russianRouletteStartDepth, bounce + 1))
+                .div(eventPdf * survivalProbability);
+    }
+
+    private double survivalProbability(Material material, int bounce, int russianRouletteStartDepth) {
+        if (bounce < russianRouletteStartDepth) {
+            return 1.0;
+        }
+
+        ColorRgb reflectance = material.getDiffuse().add(material.getSpecular());
+
+        return Math.max(
+                MIN_SURVIVAL_PROBABILITY,
+                Math.min(MAX_SURVIVAL_PROBABILITY, reflectance.maxComponent())
+        );
     }
 
     private ColorRgb directionColor(Vec3 direction) {

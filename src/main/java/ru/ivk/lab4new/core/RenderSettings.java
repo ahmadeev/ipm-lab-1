@@ -13,6 +13,7 @@ public final class RenderSettings {
     private final int height;
     private final int samplesPerPixel;
     private final int maxDepth;
+    private final int russianRouletteStartDepth;
     private final double gamma;
     private final String outputPath;
     private final String modelPath;
@@ -22,6 +23,7 @@ public final class RenderSettings {
             int height,
             int samplesPerPixel,
             int maxDepth,
+            int russianRouletteStartDepth,
             double gamma,
             String outputPath,
             String modelPath
@@ -38,6 +40,10 @@ public final class RenderSettings {
             throw new IllegalArgumentException("max depth must be positive");
         }
 
+        if (russianRouletteStartDepth < 0) {
+            throw new IllegalArgumentException("russian roulette start depth must be non-negative");
+        }
+
         if (gamma <= 0.0) {
             throw new IllegalArgumentException("gamma must be positive");
         }
@@ -46,6 +52,7 @@ public final class RenderSettings {
         this.height = height;
         this.samplesPerPixel = samplesPerPixel;
         this.maxDepth = maxDepth;
+        this.russianRouletteStartDepth = russianRouletteStartDepth;
         this.gamma = gamma;
         this.outputPath = Objects.requireNonNull(outputPath, "outputPath");
         this.modelPath = Objects.requireNonNull(modelPath, "modelPath");
@@ -56,6 +63,7 @@ public final class RenderSettings {
                 500,
                 500,
                 2,
+                5,
                 2,
                 2.2,
                 "helpers/output/lab-4new/demo.ppm",
