@@ -38,7 +38,7 @@ public class Main {
                 job.getSettings().getOutputPath()
         );
 
-        ImageBuffer image = new Renderer().render(job.getTriangle(), job.getCamera(), job.getSettings());
+        ImageBuffer image = new Renderer().render(job.getScene(), job.getCamera(), job.getSettings());
         PpmWriter.write(image, job.getSettings().getOutputPath());
         System.out.printf("Saved: %s%n", job.getSettings().getOutputPath());
     }

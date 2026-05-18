@@ -6,8 +6,8 @@ import ru.ivk.lab4new.core.ColorRgb;
 import ru.ivk.lab4new.core.Ray;
 import ru.ivk.lab4new.core.RenderSettings;
 import ru.ivk.lab4new.geometry.HitRecord;
-import ru.ivk.lab4new.geometry.Triangle;
 import ru.ivk.lab4new.image.ImageBuffer;
+import ru.ivk.lab4new.scene.Scene;
 import ru.ivk.lab4new.sampling.Sampler;
 
 import java.util.Optional;
@@ -16,7 +16,7 @@ import java.util.Optional;
  * Построитель изображения для текущего учебного этапа.
  */
 public final class Renderer {
-    public ImageBuffer render(Triangle triangle, Camera camera, RenderSettings settings) {
+    public ImageBuffer render(Scene scene, Camera camera, RenderSettings settings) {
         ImageBuffer image = new ImageBuffer(settings.getWidth(), settings.getHeight());
         Sampler sampler = new Sampler(1234567L);
 
@@ -29,7 +29,7 @@ public final class Renderer {
                     double v = (y + sampler.nextDouble()) / settings.getHeight();
                     Ray ray = camera.ray(u, v);
 
-                    color = color.add(rayColor(triangle, ray));
+                    color = color.add(rayColor(scene, ray));
                 }
 
                 image.setPixel(x, y, color.div(settings.getSamplesPerPixel()));
@@ -39,8 +39,8 @@ public final class Renderer {
         return image;
     }
 
-    private ColorRgb rayColor(Triangle triangle, Ray ray) {
-        Optional<HitRecord> hit = triangle.intersect(ray, 1e-4, Double.POSITIVE_INFINITY);
+    private ColorRgb rayColor(Scene scene, Ray ray) {
+        Optional<HitRecord> hit = scene.intersect(ray, 1e-4, Double.POSITIVE_INFINITY);
 
         if (hit.isPresent()) {
             Vec3 normal = hit.get().getNormal();
