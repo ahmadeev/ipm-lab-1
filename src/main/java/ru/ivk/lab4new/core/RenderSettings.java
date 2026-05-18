@@ -83,7 +83,7 @@ public final class RenderSettings {
                 8,
                 8,
                 4,
-                1,
+                Math.max(1, Runtime.getRuntime().availableProcessors() - 1),
                 2.2,
                 NormalizationMode.FIXED,
                 1.0,
