@@ -1,8 +1,11 @@
 package ru.ivk.lab4new.geometry;
 
+import lombok.Getter;
 import ru.ivk.common.math.Vec3;
 import ru.ivk.lab4new.core.Ray;
+import ru.ivk.lab4new.material.Material;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -15,11 +18,14 @@ public final class Triangle {
     private final Vec3 v1;
     private final Vec3 v2;
     private final Vec3 normal;
+    @Getter
+    private final Material material;
 
-    public Triangle(Vec3 v0, Vec3 v1, Vec3 v2) {
+    public Triangle(Vec3 v0, Vec3 v1, Vec3 v2, Material material) {
         this.v0 = Vec3.copyOf(v0);
         this.v1 = Vec3.copyOf(v1);
         this.v2 = Vec3.copyOf(v2);
+        this.material = Objects.requireNonNull(material, "material");
 
         Vec3 cross = this.v1.sub(this.v0).cross(this.v2.sub(this.v0));
         double crossLength = cross.length();

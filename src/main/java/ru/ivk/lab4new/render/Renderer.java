@@ -43,12 +43,7 @@ public final class Renderer {
         Optional<HitRecord> hit = scene.intersect(ray, 1e-4, Double.POSITIVE_INFINITY);
 
         if (hit.isPresent()) {
-            Vec3 normal = hit.get().getNormal();
-            return new ColorRgb(
-                    0.5 * (normal.x + 1.0),
-                    0.5 * (normal.y + 1.0),
-                    0.5 * (normal.z + 1.0)
-            );
+            return hit.get().getTriangle().getMaterial().getDiffuse();
         }
 
         return directionColor(ray.getDirection());
