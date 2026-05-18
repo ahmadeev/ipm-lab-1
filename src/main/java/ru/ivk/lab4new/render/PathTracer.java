@@ -40,7 +40,7 @@ public final class PathTracer {
 
         // расчет света
         return directLighting(scene, hit.get(), material, sampler)
-                .add(indirectDiffuse(scene, hit.get(), material, sampler, depth));
+                .add(indirectBounce(scene, ray, hit.get(), material, sampler, depth));
     }
 
     private ColorRgb directLighting(Scene scene, HitRecord hit, Material material, Sampler sampler) {
@@ -79,17 +79,32 @@ public final class PathTracer {
         return material.getDiffuse().mul(light.getEmission()).mul(geometry / (Math.PI * light.getPdf()));
     }
 
-    private ColorRgb indirectDiffuse(Scene scene, HitRecord hit, Material material, Sampler sampler, int depth) {
-        if (depth <= 1 || material.getDiffuse().isBlack()) {
+    private ColorRgb indirectBounce(Scene scene, Ray ray, HitRecord hit, Material material, Sampler sampler, int depth) {
+        if (depth <= 1) {
             return ColorRgb.BLACK;
         }
 
+        double diffuseWeight = material.getDiffuse().average();
+        double specularWeight = material.getSpecular().average();
+
+        if (diffuseWeight <= 0.0 && specularWeight <= 0.0) {
+            return ColorRgb.BLACK;
+        }
+
+        double[] weights = new double[]{diffuseWeight, specularWeight};
+        int event = sampler.chooseByWeights(weights);
+        double eventPdf = weights[event] / (diffuseWeight + specularWeight);
         Vec3 hitPoint = hit.getPoint();
         Vec3 hitNormal = hit.getNormal();
-        Vec3 direction = sampler.sampleCosineHemisphere(hitNormal);
+        Vec3 direction = event == 0
+                ? sampler.sampleCosineHemisphere(hitNormal)
+                : sampler.reflect(ray.getDirection(), hitNormal);
+        ColorRgb coefficient = event == 0
+                ? material.getDiffuse()
+                : material.getSpecular();
         Ray bounceRay = new Ray(hitPoint.add(hitNormal.mul(EPSILON)), direction);
 
-        return material.getDiffuse().mul(trace(scene, bounceRay, sampler, depth - 1));
+        return coefficient.mul(trace(scene, bounceRay, sampler, depth - 1)).div(eventPdf);
     }
 
     private ColorRgb directionColor(Vec3 direction) {

@@ -26,7 +26,7 @@ public final class DemoSceneFactory {
                 aspectRatio
         );
         Material leftMaterial = Material.diffuse(new ColorRgb(0.75, 0.18, 0.16));
-        Material rightMaterial = Material.diffuse(new ColorRgb(0.16, 0.32, 0.75));
+        Material rightMaterial = Material.mixed(new ColorRgb(0.16, 0.32, 0.55), new ColorRgb(0.22, 0.22, 0.22));
         Material lightMaterial = Material.light(new ColorRgb(1.0, 0.9, 0.55));
         Scene scene = new Scene(Arrays.asList(
                 new Triangle(

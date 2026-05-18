@@ -70,4 +70,13 @@ public final class Sampler {
                 .add(unitNormal.mul(z))
                 .normalize();
     }
+
+    public Vec3 reflect(Vec3 direction, Vec3 normal) {
+        Vec3 unitDirection = direction.normalize();
+        Vec3 unitNormal = normal.normalize();
+
+        return unitDirection
+                .sub(unitNormal.mul(2.0 * unitDirection.dot(unitNormal)))
+                .normalize();
+    }
 }
