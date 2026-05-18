@@ -19,6 +19,8 @@ public final class Triangle {
     private final Vec3 v2;
     private final Vec3 normal;
     @Getter
+    private final double area;
+    @Getter
     private final Material material;
 
     public Triangle(Vec3 v0, Vec3 v1, Vec3 v2, Material material) {
@@ -35,6 +37,7 @@ public final class Triangle {
         }
 
         this.normal = cross.mul(1.0 / crossLength);
+        this.area = crossLength * 0.5;
     }
 
     public Optional<HitRecord> intersect(Ray ray, double tMin, double tMax) {
@@ -63,6 +66,18 @@ public final class Triangle {
 
     public Vec3 getNormal() {
         return Vec3.copyOf(normal);
+    }
+
+    public Vec3 samplePoint(double xi1, double xi2) {
+        double u = xi1;
+        double v = xi2;
+
+        if (u + v > 1.0) {
+            u = 1.0 - u;
+            v = 1.0 - v;
+        }
+
+        return v0.add(v1.sub(v0).mul(u)).add(v2.sub(v0).mul(v));
     }
 
     private boolean contains(Vec3 point) {

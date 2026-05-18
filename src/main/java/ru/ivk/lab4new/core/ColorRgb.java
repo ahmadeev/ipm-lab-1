@@ -32,6 +32,10 @@ public final class ColorRgb {
         return new ColorRgb(r / value, g / value, b / value);
     }
 
+    public double average() {
+        return (r + g + b) / 3.0;
+    }
+
     public boolean isBlack() {
         return r == 0.0 && g == 0.0 && b == 0.0;
     }
