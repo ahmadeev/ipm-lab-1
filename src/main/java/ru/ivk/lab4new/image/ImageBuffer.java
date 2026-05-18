@@ -3,6 +3,9 @@ package ru.ivk.lab4new.image;
 import lombok.Getter;
 import ru.ivk.lab4new.core.ColorRgb;
 
+/**
+ * Буфер изображения, хранящий RGB-значения для каждого пикселя.
+ */
 @Getter
 public final class ImageBuffer {
     private final int width;

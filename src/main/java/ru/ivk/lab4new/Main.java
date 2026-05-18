@@ -1,12 +1,16 @@
 package ru.ivk.lab4new;
 
 import ru.ivk.lab4new.core.RenderSettings;
+import ru.ivk.lab4new.image.ImageBuffer;
+import ru.ivk.lab4new.image.PpmWriter;
+import ru.ivk.lab4new.render.Renderer;
 import ru.ivk.lab4new.scene.RenderJob;
 
+import java.io.IOException;
 import java.util.Locale;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Locale.setDefault(Locale.US);
 
         if (args.length == 0 || "demo".equalsIgnoreCase(args[0])) {
@@ -17,7 +21,7 @@ public class Main {
         printUsage();
     }
 
-    private static void runDemo() {
+    private static void runDemo() throws IOException {
         RenderSettings settings = RenderSettings.demo();
         RenderJob job = new RenderJob(settings);
 
@@ -29,6 +33,10 @@ public class Main {
                 job.getSettings().getMaxDepth(),
                 job.getSettings().getOutputPath()
         );
+
+        ImageBuffer image = new Renderer().render(job.getSettings());
+        PpmWriter.write(image, job.getSettings().getOutputPath());
+        System.out.printf("Saved: %s%n", job.getSettings().getOutputPath());
     }
 
     private static void printUsage() {

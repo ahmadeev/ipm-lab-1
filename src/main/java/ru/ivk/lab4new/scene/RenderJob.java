@@ -5,6 +5,9 @@ import ru.ivk.lab4new.core.RenderSettings;
 
 import java.util.Objects;
 
+/**
+ * Контейнер данных, необходимых для запуска одного задания рендера.
+ */
 @Getter
 public final class RenderJob {
     private final RenderSettings settings;

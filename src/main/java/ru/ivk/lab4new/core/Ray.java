@@ -2,6 +2,9 @@ package ru.ivk.lab4new.core;
 
 import ru.ivk.common.math.Vec3;
 
+/**
+ * Геометрический луч с началом и нормализованным направлением.
+ */
 public final class Ray {
     private final Vec3 origin;
     private final Vec3 direction;

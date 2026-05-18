@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.util.Objects;
 
+/**
+ * Набор базовых параметров, управляющих построением изображения.
+ */
 @Getter
 public final class RenderSettings {
     private final int width;

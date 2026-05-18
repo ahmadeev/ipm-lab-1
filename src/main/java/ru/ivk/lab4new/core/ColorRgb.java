@@ -1,5 +1,8 @@
 package ru.ivk.lab4new.core;
 
+/**
+ * RGB-цвет в вещественных компонентах для накопления яркости.
+ */
 public final class ColorRgb {
     public static final ColorRgb BLACK = new ColorRgb(0.0, 0.0, 0.0);
 
