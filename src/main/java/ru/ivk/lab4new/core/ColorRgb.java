@@ -24,6 +24,10 @@ public final class ColorRgb {
         return new ColorRgb(r * value, g * value, b * value);
     }
 
+    public ColorRgb mul(ColorRgb color) {
+        return new ColorRgb(r * color.r, g * color.g, b * color.b);
+    }
+
     public ColorRgb div(double value) {
         if (value == 0.0) {
             throw new IllegalArgumentException("division by zero");

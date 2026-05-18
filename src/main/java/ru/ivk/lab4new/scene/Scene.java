@@ -46,6 +46,10 @@ public final class Scene {
         return Optional.ofNullable(closestHit);
     }
 
+    public boolean isOccluded(Ray ray, double tMin, double tMax) {
+        return intersect(ray, tMin, tMax).isPresent();
+    }
+
     private List<Triangle> collectLights(List<Triangle> triangles) {
         List<Triangle> lightTriangles = new ArrayList<>();
 
