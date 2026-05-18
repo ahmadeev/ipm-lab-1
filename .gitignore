@@ -3,6 +3,8 @@ helpers/output/
 helpers/plans/
 helpers/memory/
 
+output/
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

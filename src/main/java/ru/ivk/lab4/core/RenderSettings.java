@@ -63,7 +63,7 @@ public final class RenderSettings {
                 24,
                 6,
                 2.2,
-                "helpers/output/lab-4/demo.ppm",
+                "output/lab4-demo.ppm",
                 NormalizationMode.MAX,
                 1.0,
                 Math.max(1, Runtime.getRuntime().availableProcessors() - 1)

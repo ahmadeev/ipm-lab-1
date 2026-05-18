@@ -49,7 +49,7 @@ public class Main {
         int samplesPerPixel = input.readInt("Samples per pixel", 32, 1);
         int maxDepth = input.readInt("Максимальная глубина трассировки", 6, 1);
         double gamma = input.readDouble("Gamma", 2.2, 0.1);
-        String outputPath = input.readString("Путь выходного .ppm файла", "helpers/output/lab-4/manual.ppm");
+        String outputPath = input.readString("Путь выходного .ppm файла", "output/lab4-manual.ppm");
         NormalizationMode normalizationMode = input.readNormalizationMode("Режим нормировки яркости", NormalizationMode.MAX);
         double fixedExposure = normalizationMode == NormalizationMode.FIXED
                 ? input.readDouble("Фиксированный множитель яркости", 1.0, 0.0001)

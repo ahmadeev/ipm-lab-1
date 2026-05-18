@@ -92,7 +92,7 @@ public final class RenderSettings {
                 NormalizationMode.MAX,
                 1.0,
                 ImageFormat.BOTH,
-                "helpers/output/lab-4new/demo",
+                "output/lab4new-demo",
                 "cube.obj"
         );
     }
