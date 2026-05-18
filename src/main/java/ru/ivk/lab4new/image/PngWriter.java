@@ -18,7 +18,11 @@ public final class PngWriter {
     }
 
     public static void write(ImageBuffer image, RenderSettings settings) throws IOException {
-        Path path = Paths.get(settings.getOutputPath());
+        write(image, settings, settings.getOutputPath());
+    }
+
+    public static void write(ImageBuffer image, RenderSettings settings, String outputPath) throws IOException {
+        Path path = Paths.get(outputPath);
         Path parent = path.getParent();
 
         if (parent != null) {

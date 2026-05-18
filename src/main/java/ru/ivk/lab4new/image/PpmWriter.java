@@ -27,13 +27,17 @@ public final class PpmWriter {
                 1.0,
                 NormalizationMode.NONE,
                 1.0,
+                ImageFormat.PPM,
                 outputPath,
                 "cube.obj"
         ));
     }
 
     public static void write(ImageBuffer image, RenderSettings settings) throws IOException {
-        String outputPath = settings.getOutputPath();
+        write(image, settings, settings.getOutputPath());
+    }
+
+    public static void write(ImageBuffer image, RenderSettings settings, String outputPath) throws IOException {
         Path path = Paths.get(outputPath);
         Path parent = path.getParent();
 

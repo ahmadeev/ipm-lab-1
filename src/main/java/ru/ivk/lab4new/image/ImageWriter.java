@@ -12,13 +12,27 @@ public final class ImageWriter {
     }
 
     public static void write(ImageBuffer image, RenderSettings settings) throws IOException {
-        String outputPath = settings.getOutputPath().toLowerCase();
-
-        if (outputPath.endsWith(".png")) {
-            PngWriter.write(image, settings);
+        if (settings.getImageFormat() == ImageFormat.PNG) {
+            PngWriter.write(image, settings, pathWithExtension(settings.getOutputPath(), ".png"));
             return;
         }
 
-        PpmWriter.write(image, settings);
+        if (settings.getImageFormat() == ImageFormat.PPM) {
+            PpmWriter.write(image, settings, pathWithExtension(settings.getOutputPath(), ".ppm"));
+            return;
+        }
+
+        PngWriter.write(image, settings, pathWithExtension(settings.getOutputPath(), ".png"));
+        PpmWriter.write(image, settings, pathWithExtension(settings.getOutputPath(), ".ppm"));
+    }
+
+    private static String pathWithExtension(String outputPath, String extension) {
+        String lowerPath = outputPath.toLowerCase();
+
+        if (lowerPath.endsWith(".png") || lowerPath.endsWith(".ppm")) {
+            return outputPath.substring(0, outputPath.length() - 4) + extension;
+        }
+
+        return outputPath + extension;
     }
 }

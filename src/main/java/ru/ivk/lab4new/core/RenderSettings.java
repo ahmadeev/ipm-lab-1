@@ -1,6 +1,7 @@
 package ru.ivk.lab4new.core;
 
 import lombok.Getter;
+import ru.ivk.lab4new.image.ImageFormat;
 import ru.ivk.lab4new.image.NormalizationMode;
 
 import java.util.Objects;
@@ -19,6 +20,7 @@ public final class RenderSettings {
     private final double gamma;
     private final NormalizationMode normalizationMode;
     private final double fixedExposure;
+    private final ImageFormat imageFormat;
     private final String outputPath;
     private final String modelPath;
 
@@ -32,6 +34,7 @@ public final class RenderSettings {
             double gamma,
             NormalizationMode normalizationMode,
             double fixedExposure,
+            ImageFormat imageFormat,
             String outputPath,
             String modelPath
     ) {
@@ -72,6 +75,7 @@ public final class RenderSettings {
         this.gamma = gamma;
         this.normalizationMode = Objects.requireNonNull(normalizationMode, "normalizationMode");
         this.fixedExposure = fixedExposure;
+        this.imageFormat = Objects.requireNonNull(imageFormat, "imageFormat");
         this.outputPath = Objects.requireNonNull(outputPath, "outputPath");
         this.modelPath = Objects.requireNonNull(modelPath, "modelPath");
     }
@@ -85,9 +89,10 @@ public final class RenderSettings {
                 4,
                 Math.max(1, Runtime.getRuntime().availableProcessors() - 1),
                 2.2,
-                NormalizationMode.FIXED,
+                NormalizationMode.MAX,
                 1.0,
-                "helpers/output/lab-4new/demo.ppm",
+                ImageFormat.BOTH,
+                "helpers/output/lab-4new/demo",
                 "cube.obj"
         );
     }

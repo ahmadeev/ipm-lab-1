@@ -45,7 +45,7 @@ public class Main {
         RenderJob job = ObjSceneFactory.create(settings);
 
         System.out.printf(
-                "Render: %dx%d, spp=%d, maxDepth=%d, rrStart=%d, threads=%d, gamma=%.3f, normalization=%s, exposure=%.3f, model=%s, output=%s%n",
+                "Render: %dx%d, spp=%d, maxDepth=%d, rrStart=%d, threads=%d, gamma=%.3f, normalization=%s, exposure=%.3f, format=%s, model=%s, output=%s%n",
                 job.getSettings().getWidth(),
                 job.getSettings().getHeight(),
                 job.getSettings().getSamplesPerPixel(),
@@ -55,6 +55,7 @@ public class Main {
                 job.getSettings().getGamma(),
                 job.getSettings().getNormalizationMode(),
                 job.getSettings().getFixedExposure(),
+                job.getSettings().getImageFormat(),
                 job.getSettings().getModelPath(),
                 job.getSettings().getOutputPath()
         );

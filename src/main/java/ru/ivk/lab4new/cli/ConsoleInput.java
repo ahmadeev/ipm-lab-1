@@ -1,6 +1,7 @@
 package ru.ivk.lab4new.cli;
 
 import ru.ivk.lab4new.core.RenderSettings;
+import ru.ivk.lab4new.image.ImageFormat;
 import ru.ivk.lab4new.image.NormalizationMode;
 
 import java.util.Locale;
@@ -33,7 +34,8 @@ public final class ConsoleInput {
         double gamma = readDouble("Gamma", defaults.getGamma());
         NormalizationMode normalizationMode = readNormalizationMode(defaults.getNormalizationMode());
         double fixedExposure = readDouble("Fixed exposure", defaults.getFixedExposure());
-        String outputPath = readString("Output path (.png or .ppm)", defaults.getOutputPath());
+        ImageFormat imageFormat = readImageFormat(defaults.getImageFormat());
+        String outputPath = readString("Output path", defaults.getOutputPath());
 
         return new RenderSettings(
                 width,
@@ -45,6 +47,7 @@ public final class ConsoleInput {
                 gamma,
                 normalizationMode,
                 fixedExposure,
+                imageFormat,
                 outputPath,
                 modelPath
         );
@@ -89,6 +92,18 @@ public final class ConsoleInput {
                 return NormalizationMode.valueOf(value.toUpperCase(Locale.US));
             } catch (IllegalArgumentException exception) {
                 System.out.println("Enter NONE, FIXED, or MAX.");
+            }
+        }
+    }
+
+    private ImageFormat readImageFormat(ImageFormat defaultValue) {
+        while (true) {
+            String value = readString("Image format: PNG, PPM, BOTH", defaultValue.name());
+
+            try {
+                return ImageFormat.valueOf(value.toUpperCase(Locale.US));
+            } catch (IllegalArgumentException exception) {
+                System.out.println("Enter PNG, PPM, or BOTH.");
             }
         }
     }
