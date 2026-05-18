@@ -60,11 +60,11 @@ public final class DemoSceneFactory {
         Vec3 p110 = new Vec3(max.x, max.y, min.z);
         Vec3 p111 = new Vec3(max.x, max.y, max.z);
 
-        addQuad(triangles, p000, p100, p110, p010, material);
-        addQuad(triangles, p101, p001, p011, p111, material);
-        addQuad(triangles, p001, p000, p010, p011, material);
-        addQuad(triangles, p100, p101, p111, p110, material);
-        addQuad(triangles, p010, p110, p111, p011, material);
-        addQuad(triangles, p001, p101, p100, p000, material);
+        addQuad(triangles, p000, p010, p110, p100, material);
+        addQuad(triangles, p001, p101, p111, p011, material);
+        addQuad(triangles, p000, p001, p011, p010, material);
+        addQuad(triangles, p100, p110, p111, p101, material);
+        addQuad(triangles, p010, p011, p111, p110, material);
+        addQuad(triangles, p000, p100, p101, p001, material);
     }
 }
