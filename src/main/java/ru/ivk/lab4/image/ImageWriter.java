@@ -1,6 +1,6 @@
-package ru.ivk.lab4new.image;
+package ru.ivk.lab4.image;
 
-import ru.ivk.lab4new.core.RenderSettings;
+import ru.ivk.lab4.core.RenderSettings;
 
 import java.io.IOException;
 

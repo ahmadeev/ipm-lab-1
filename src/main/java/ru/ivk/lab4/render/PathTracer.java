@@ -5,135 +5,155 @@ import ru.ivk.lab4.core.ColorRgb;
 import ru.ivk.lab4.core.Ray;
 import ru.ivk.lab4.geometry.HitRecord;
 import ru.ivk.lab4.material.Material;
+import ru.ivk.lab4.scene.Scene;
 import ru.ivk.lab4.sampling.LightSample;
 import ru.ivk.lab4.sampling.LightSampler;
 import ru.ivk.lab4.sampling.Sampler;
-import ru.ivk.lab4.scene.Scene;
 
 import java.util.Optional;
 
+/**
+ * Трассировщик одного луча для текущей базовой модели сцены.
+ */
 public final class PathTracer {
     private static final double EPSILON = 1e-4;
-    private static final int RUSSIAN_ROULETTE_START_DEPTH = 3;
+    private static final double MIN_SURVIVAL_PROBABILITY = 0.1;
+    private static final double MAX_SURVIVAL_PROBABILITY = 0.95;
+    private final LightSampler lightSampler = new LightSampler();
 
-    public ColorRgb trace(Scene scene, Ray ray, int maxDepth, Sampler sampler) {
-        return trace(scene, new LightSampler(scene.getLights()), ray, maxDepth, sampler);
+    public ColorRgb trace(Scene scene, Ray ray, Sampler sampler, int depth, int russianRouletteStartDepth) {
+        return trace(scene, ray, sampler, depth, russianRouletteStartDepth, 0);
     }
 
-    public ColorRgb trace(Scene scene, LightSampler lightSampler, Ray ray, int maxDepth, Sampler sampler) {
-        return traceRecursive(scene, lightSampler, ray, maxDepth, sampler, 0);
-    }
-
-    private ColorRgb traceRecursive(
-            Scene scene,
-            LightSampler lightSampler,
-            Ray ray,
-            int maxDepth,
-            Sampler sampler,
-            int depth
-    ) {
-        if (depth >= maxDepth) {
+    private ColorRgb trace(Scene scene, Ray ray, Sampler sampler, int depth, int russianRouletteStartDepth, int bounce) {
+        if (depth <= 0) {
             return ColorRgb.BLACK;
         }
 
-        Optional<HitRecord> hitOptional = scene.intersect(ray, EPSILON, Double.POSITIVE_INFINITY);
+        Optional<HitRecord> hit = scene.intersect(ray, EPSILON, Double.POSITIVE_INFINITY);
 
-        if (!hitOptional.isPresent()) {
-            return ColorRgb.BLACK;
+        // пересечение не найдено
+        if (!hit.isPresent()) {
+            return directionColor(ray.getDirection());
         }
 
-        HitRecord hit = hitOptional.get();
-        Material material = hit.getMaterial();
-        ColorRgb result = material.getEmission();
+        Material material = hit.get().getTriangle().getMaterial();
 
+        // пересечение -- свет
         if (material.isLight()) {
-            return result;
+            return material.getEmission();
         }
 
-        result = result.add(estimateDirectLighting(scene, lightSampler, hit, sampler));
-
-        double diffuseWeight = material.diffuseWeight();
-        double specularWeight = material.specularWeight();
-        double totalWeight = diffuseWeight + specularWeight;
-
-        if (totalWeight <= 0.0) {
-            return result;
-        }
-
-        double survivalProbability = survivalProbability(material, depth);
-
-        if (depth >= RUSSIAN_ROULETTE_START_DEPTH && sampler.nextDouble() > survivalProbability) {
-            return result;
-        }
-
-        boolean chooseDiffuse = sampler.nextDouble() < diffuseWeight / totalWeight;
-        ColorRgb reflectance = chooseDiffuse ? material.getDiffuse() : material.getSpecular();
-        double eventProbability = chooseDiffuse ? diffuseWeight / totalWeight : specularWeight / totalWeight;
-
-        Vec3 origin = hit.getPoint().add(hit.getNormal().mul(EPSILON));
-        Vec3 nextDirection = chooseDiffuse
-                ? sampler.cosineHemisphere(hit.getNormal())
-                : Sampler.reflect(ray.getDirection(), hit.getNormal());
-
-        ColorRgb indirect = traceRecursive(
-                scene,
-                lightSampler,
-                new Ray(origin, nextDirection),
-                maxDepth,
-                sampler,
-                depth + 1
-        );
-
-        double rouletteFactor = depth >= RUSSIAN_ROULETTE_START_DEPTH ? survivalProbability : 1.0;
-        ColorRgb weightedIndirect = indirect.mul(reflectance).div(eventProbability * rouletteFactor);
-
-        return result.add(weightedIndirect);
+        // расчет света
+        return directLighting(scene, hit.get(), material, sampler)
+                .add(indirectBounce(scene, ray, hit.get(), material, sampler, depth, russianRouletteStartDepth, bounce));
     }
 
-    private ColorRgb estimateDirectLighting(Scene scene, LightSampler lightSampler, HitRecord hit, Sampler sampler) {
-        if (!lightSampler.hasLights()) {
+    private ColorRgb directLighting(Scene scene, HitRecord hit, Material material, Sampler sampler) {
+        if (scene.getLights().isEmpty()) {
             return ColorRgb.BLACK;
         }
 
-        LightSample sample = lightSampler.sample(sampler);
+        LightSample light = lightSampler.sample(scene, sampler);
         Vec3 hitPoint = hit.getPoint();
-        Vec3 lightPoint = sample.getPoint();
-        Vec3 toLight = lightPoint.sub(hitPoint);
+        Vec3 hitNormal = hit.getNormal();
+        Vec3 toLight = light.getPoint().sub(hitPoint);
         double distanceSquared = toLight.dot(toLight);
+
+        if (distanceSquared <= EPSILON) {
+            return ColorRgb.BLACK;
+        }
+
         double distance = Math.sqrt(distanceSquared);
+        Vec3 lightDirection = toLight.mul(1.0 / distance);
+        // максимум 90 градусов между нормалью и направлением на свет, иначе поверхность отвернута от света
+        double surfaceCos = Math.max(0.0, hitNormal.dot(lightDirection));
+        // свет направлен на точку?
+        double lightCos = Math.max(0.0, light.getNormal().dot(lightDirection.mul(-1.0)));
 
-        if (distance <= EPSILON) {
+        if (surfaceCos <= 0.0 || lightCos <= 0.0 || light.getPdf() <= 0.0) {
             return ColorRgb.BLACK;
         }
 
-        Vec3 directionToLight = toLight.mul(1.0 / distance);
-        double surfaceCos = Math.max(0.0, hit.getNormal().dot(directionToLight));
-        double lightCos = Math.max(0.0, sample.getLight().getNormal().dot(directionToLight.mul(-1.0)));
+        Ray shadowRay = new Ray(hitPoint.add(hitNormal.mul(EPSILON)), lightDirection);
 
-        if (surfaceCos <= 0.0 || lightCos <= 0.0) {
+        Optional<HitRecord> shadowHit = scene.intersect(shadowRay, EPSILON, distance - EPSILON);
+
+        if (shadowHit.isPresent() && shadowHit.get().getTriangle() != light.getLight()) {
             return ColorRgb.BLACK;
         }
 
-        Ray shadowRay = new Ray(hitPoint.add(hit.getNormal().mul(EPSILON)), directionToLight);
-
-        if (scene.isOccluded(shadowRay, EPSILON, distance - EPSILON)) {
-            return ColorRgb.BLACK;
-        }
-
-        double pdfArea = sample.getLightPickProbability() / sample.getLight().getArea();
-        double geometryTerm = surfaceCos * lightCos / distanceSquared;
-
-        return sample.getLight().getMaterial().getEmission()
-                .mul(hit.getMaterial().getDiffuse())
-                .mul(geometryTerm / (Math.PI * pdfArea));
+        double geometry = surfaceCos * lightCos / distanceSquared;
+        return material.getDiffuse().mul(light.getEmission()).mul(geometry / (Math.PI * light.getPdf()));
     }
 
-    private static double survivalProbability(Material material, int depth) {
-        if (depth < RUSSIAN_ROULETTE_START_DEPTH) {
+    private ColorRgb indirectBounce(
+            Scene scene,
+            Ray ray,
+            HitRecord hit,
+            Material material,
+            Sampler sampler,
+            int depth,
+            int russianRouletteStartDepth,
+            int bounce
+    ) {
+        if (depth <= 1) {
+            return ColorRgb.BLACK;
+        }
+
+        double diffuseWeight = material.getDiffuse().average();
+        double specularWeight = material.getSpecular().average();
+
+        if (diffuseWeight <= 0.0 && specularWeight <= 0.0) {
+            return ColorRgb.BLACK;
+        }
+
+        double[] weights = new double[]{diffuseWeight, specularWeight};
+        int event = sampler.chooseByWeights(weights);
+        double eventPdf = weights[event] / (diffuseWeight + specularWeight);
+        Vec3 hitPoint = hit.getPoint();
+        Vec3 hitNormal = hit.getNormal();
+        Vec3 direction = event == 0
+                ? sampler.sampleCosineHemisphere(hitNormal)
+                : sampler.reflect(ray.getDirection(), hitNormal);
+        ColorRgb coefficient = event == 0
+                ? material.getDiffuse()
+                : material.getSpecular();
+        double survivalProbability = survivalProbability(material, bounce, russianRouletteStartDepth);
+
+        if (survivalProbability < 1.0 && sampler.nextDouble() >= survivalProbability) {
+            return ColorRgb.BLACK;
+        }
+
+        Ray bounceRay = new Ray(hitPoint.add(hitNormal.mul(EPSILON)), direction);
+
+        return coefficient
+                .mul(trace(scene, bounceRay, sampler, depth - 1, russianRouletteStartDepth, bounce + 1))
+                .div(eventPdf * survivalProbability);
+    }
+
+    private double survivalProbability(Material material, int bounce, int russianRouletteStartDepth) {
+        if (bounce < russianRouletteStartDepth) {
             return 1.0;
         }
 
-        double maxReflectance = material.getDiffuse().add(material.getSpecular()).maxComponent();
-        return Math.max(0.1, Math.min(0.95, maxReflectance));
+        ColorRgb reflectance = material.getDiffuse().add(material.getSpecular());
+
+        return Math.max(
+                MIN_SURVIVAL_PROBABILITY,
+                Math.min(MAX_SURVIVAL_PROBABILITY, reflectance.maxComponent())
+        );
+    }
+
+    private ColorRgb directionColor(Vec3 direction) {
+        // return ColorRgb.BLACK;
+
+        Vec3 unit = direction.normalize();
+
+        return new ColorRgb(
+                0.5 * (unit.x + 1.0),
+                0.5 * (unit.y + 1.0),
+                0.5 * (unit.z + 1.0)
+        );
     }
 }

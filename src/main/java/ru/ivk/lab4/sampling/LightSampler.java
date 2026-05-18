@@ -1,42 +1,60 @@
 package ru.ivk.lab4.sampling;
 
 import ru.ivk.lab4.geometry.Triangle;
+import ru.ivk.lab4.scene.Scene;
 
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * Выбирает протяженный источник света по мощности и точку на нем равномерно по площади.
+ */
 public final class LightSampler {
-    private final List<Triangle> lights;
-    private final double[] weights;
-    private final double totalWeight;
+    public LightSample sample(Scene scene, Sampler sampler) {
+        Objects.requireNonNull(scene, "scene");
+        Objects.requireNonNull(sampler, "sampler");
 
-    public LightSampler(List<Triangle> lights) {
-        this.lights = lights;
-        this.weights = new double[lights.size()];
+        List<Triangle> lights = scene.getLights();
 
-        double sum = 0.0;
-
-        for (int i = 0; i < lights.size(); i++) {
-            double power = lights.get(i).getArea() * lights.get(i).getMaterial().getEmission().average();
-            weights[i] = power;
-            sum += power;
+        if (lights.isEmpty()) {
+            throw new IllegalArgumentException("scene must contain at least one light");
         }
 
-        this.totalWeight = sum;
-    }
-
-    public boolean hasLights() {
-        return !lights.isEmpty() && totalWeight > 0.0;
-    }
-
-    public LightSample sample(Sampler sampler) {
-        int index = sampler.chooseByWeights(weights);
-        Triangle light = lights.get(index);
-        double probability = weights[index] / totalWeight;
+        double[] weights = buildWeights(lights);
+        double totalWeight = sum(weights);
+        int lightIndex = sampler.chooseByWeights(weights);
+        Triangle light = lights.get(lightIndex);
+        double selectionPdf = weights[lightIndex] / totalWeight; // вероятность выбора источника
+        double areaPdf = 1.0 / light.getArea(); // вероятность выбора точки
 
         return new LightSample(
                 light,
                 light.samplePoint(sampler.nextDouble(), sampler.nextDouble()),
-                probability
+                light.getNormal(),
+                light.getMaterial().getEmission(),
+                selectionPdf,
+                areaPdf
         );
+    }
+
+    private double[] buildWeights(List<Triangle> lights) {
+        double[] weights = new double[lights.size()];
+
+        for (int index = 0; index < lights.size(); index++) {
+            Triangle light = lights.get(index);
+            weights[index] = light.getArea() * light.getMaterial().getEmission().average();
+        }
+
+        return weights;
+    }
+
+    private double sum(double[] weights) {
+        double total = 0.0;
+
+        for (double weight : weights) {
+            total += weight;
+        }
+
+        return total;
     }
 }

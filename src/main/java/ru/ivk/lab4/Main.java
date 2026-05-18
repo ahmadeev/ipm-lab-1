@@ -3,20 +3,19 @@ package ru.ivk.lab4;
 import ru.ivk.lab4.cli.ConsoleInput;
 import ru.ivk.lab4.core.RenderSettings;
 import ru.ivk.lab4.image.ImageBuffer;
-import ru.ivk.lab4.image.NormalizationMode;
-import ru.ivk.lab4.image.PngWriter;
-import ru.ivk.lab4.image.PpmWriter;
+import ru.ivk.lab4.image.ImageWriter;
 import ru.ivk.lab4.render.Renderer;
 import ru.ivk.lab4.scene.DemoSceneFactory;
 import ru.ivk.lab4.scene.ObjSceneFactory;
 import ru.ivk.lab4.scene.RenderJob;
+import ru.ivk.lab4.scene.SceneSource;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
-import java.util.Scanner;
 
+/**
+ * Точка входа для пошаговой реализации новой версии лабораторной 4.
+ */
 public class Main {
     public static void main(String[] args) throws IOException {
         Locale.setDefault(Locale.US);
@@ -35,106 +34,45 @@ public class Main {
     }
 
     private static void runDemo() throws IOException {
-        RenderSettings settings = RenderSettings.demo();
-        RenderJob job = DemoSceneFactory.create(settings);
-        renderAndWrite(job, settings);
+        render(RenderSettings.demo());
     }
 
     private static void runManual() throws IOException {
-        ConsoleInput input = new ConsoleInput(new Scanner(System.in));
+        RenderSettings settings = new ConsoleInput().readSettings(RenderSettings.demo());
 
-        String sceneMode = input.readString("Сцена: demo или obj", "demo").toLowerCase(Locale.ROOT);
-        int width = input.readInt("Ширина изображения", 500, 1);
-        int height = input.readInt("Высота изображения", 500, 1);
-        int samplesPerPixel = input.readInt("Samples per pixel", 32, 1);
-        int maxDepth = input.readInt("Максимальная глубина трассировки", 6, 1);
-        double gamma = input.readDouble("Gamma", 2.2, 0.1);
-        String outputPath = input.readString("Путь выходного .ppm файла", "output/lab4-manual.ppm");
-        NormalizationMode normalizationMode = input.readNormalizationMode("Режим нормировки яркости", NormalizationMode.MAX);
-        double fixedExposure = normalizationMode == NormalizationMode.FIXED
-                ? input.readDouble("Фиксированный множитель яркости", 1.0, 0.0001)
-                : 1.0;
-        int defaultThreadCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
-        int threadCount = input.readInt("Количество потоков", defaultThreadCount, 1);
-
-        RenderSettings settings = new RenderSettings(
-                width,
-                height,
-                samplesPerPixel,
-                maxDepth,
-                gamma,
-                outputPath,
-                normalizationMode,
-                fixedExposure,
-                threadCount
-        );
-
-        RenderJob job;
-
-        if ("obj".equals(sceneMode)) {
-            String objPath = input.readString("Путь к OBJ-файлу", "scene.obj");
-            job = ObjSceneFactory.create(Paths.get(objPath), settings);
-        } else {
-            job = DemoSceneFactory.create(settings);
-        }
-
-        renderAndWrite(job, settings);
+        render(settings);
     }
 
-    private static void renderAndWrite(RenderJob job, RenderSettings settings) throws IOException {
+    private static void render(RenderSettings settings) throws IOException {
+        RenderJob job = settings.getSceneSource() == SceneSource.CODE
+                ? DemoSceneFactory.create(settings)
+                : ObjSceneFactory.create(settings);
+
         System.out.printf(
-                "Render: %dx%d, spp=%d, maxDepth=%d, threads=%d%n",
-                settings.getWidth(),
-                settings.getHeight(),
-                settings.getSamplesPerPixel(),
-                settings.getMaxDepth(),
-                settings.getThreadCount()
+                "Render: %dx%d, spp=%d, maxDepth=%d, rrStart=%d, threads=%d, gamma=%.3f, normalization=%s, exposure=%.3f, format=%s, scene=%s, model=%s, output=%s%n",
+                job.getSettings().getWidth(),
+                job.getSettings().getHeight(),
+                job.getSettings().getSamplesPerPixel(),
+                job.getSettings().getMaxDepth(),
+                job.getSettings().getRussianRouletteStartDepth(),
+                job.getSettings().getThreadCount(),
+                job.getSettings().getGamma(),
+                job.getSettings().getNormalizationMode(),
+                job.getSettings().getFixedExposure(),
+                job.getSettings().getImageFormat(),
+                job.getSettings().getSceneSource(),
+                job.getSettings().getModelPath(),
+                job.getSettings().getOutputPath()
         );
 
-        ImageBuffer image = new Renderer().render(job.getScene(), job.getCamera(), settings);
-        Path ppmPath = Paths.get(settings.getOutputPath());
-        Path pngPath = toPngPath(ppmPath);
-
-        PpmWriter.write(
-                image,
-                ppmPath,
-                settings.getNormalizationMode(),
-                settings.getFixedExposure(),
-                settings.getGamma()
-        );
-
-        PngWriter.write(
-                image,
-                pngPath,
-                settings.getNormalizationMode(),
-                settings.getFixedExposure(),
-                settings.getGamma()
-        );
-
-        System.out.printf("Saved: %s%n", ppmPath);
-        System.out.printf("Saved: %s%n", pngPath);
-    }
-
-    private static Path toPngPath(Path ppmPath) {
-        Path fileNamePath = ppmPath.getFileName();
-
-        if (fileNamePath == null) {
-            return Paths.get("output.png");
-        }
-
-        String fileName = fileNamePath.toString();
-        int dotIndex = fileName.lastIndexOf('.');
-        String pngFileName = dotIndex >= 0
-                ? fileName.substring(0, dotIndex) + ".png"
-                : fileName + ".png";
-        Path parent = ppmPath.getParent();
-
-        return parent == null ? Paths.get(pngFileName) : parent.resolve(pngFileName);
+        ImageBuffer image = new Renderer().render(job.getScene(), job.getCamera(), job.getSettings());
+        ImageWriter.write(image, job.getSettings());
+        System.out.printf("Saved: %s%n", job.getSettings().getOutputPath());
     }
 
     private static void printUsage() {
         System.out.println("Usage:");
-        System.out.println("  java ru.ivk.lab4.Main demo");
-        System.out.println("  java ru.ivk.lab4.Main manual");
+        System.out.println("  java ru.ivk.lab4new.Main demo");
+        System.out.println("  java ru.ivk.lab4new.Main manual");
     }
 }

@@ -1,12 +1,23 @@
 package ru.ivk.lab4.scene;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ru.ivk.lab4.core.Camera;
+import ru.ivk.lab4.core.RenderSettings;
 
+import java.util.Objects;
+
+/**
+ * Контейнер данных, необходимых для запуска одного задания рендера.
+ */
 @Getter
-@RequiredArgsConstructor
 public final class RenderJob {
-    private final Scene scene;
+    private final RenderSettings settings;
     private final Camera camera;
+    private final Scene scene;
+
+    public RenderJob(RenderSettings settings, Camera camera, Scene scene) {
+        this.settings = Objects.requireNonNull(settings, "settings");
+        this.camera = Objects.requireNonNull(camera, "camera");
+        this.scene = Objects.requireNonNull(scene, "scene");
+    }
 }

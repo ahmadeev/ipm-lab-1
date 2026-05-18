@@ -3,10 +3,12 @@ package ru.ivk.lab4.image;
 import lombok.Getter;
 import ru.ivk.lab4.core.ColorRgb;
 
+/**
+ * Буфер изображения, хранящий RGB-значения для каждого пикселя.
+ */
+@Getter
 public final class ImageBuffer {
-    @Getter
     private final int width;
-    @Getter
     private final int height;
     private final ColorRgb[] pixels;
 
@@ -25,26 +27,16 @@ public final class ImageBuffer {
     }
 
     public void setPixel(int x, int y, ColorRgb color) {
-        pixels[index(x, y)] = color;
+        pixels[indexOf(x, y)] = color;
     }
 
     public ColorRgb getPixel(int x, int y) {
-        return pixels[index(x, y)];
+        return pixels[indexOf(x, y)];
     }
 
-    public double maxComponent() {
-        double max = 0.0;
-
-        for (ColorRgb pixel : pixels) {
-            max = Math.max(max, pixel.maxComponent());
-        }
-
-        return max;
-    }
-
-    private int index(int x, int y) {
+    private int indexOf(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            throw new IndexOutOfBoundsException("pixel is outside image");
+            throw new IndexOutOfBoundsException("pixel coordinates are outside image");
         }
 
         return y * width + x;

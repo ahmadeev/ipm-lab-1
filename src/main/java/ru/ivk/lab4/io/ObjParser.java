@@ -5,17 +5,40 @@ import ru.ivk.lab4.geometry.Triangle;
 import ru.ivk.lab4.material.Material;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Читает простую OBJ-сетку и преобразует ее грани в треугольники сцены.
+ */
 public final class ObjParser {
     public List<Triangle> parse(Path path, Material material) throws IOException {
+        return parseLines(Files.readAllLines(path, StandardCharsets.UTF_8), material);
+    }
+
+    public List<Triangle> parse(InputStream inputStream, Material material) throws IOException {
+        List<String> lines = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+
+        return parseLines(lines, material);
+    }
+
+    private List<Triangle> parseLines(List<String> lines, Material material) {
         List<Vec3> vertices = new ArrayList<>();
         List<Triangle> triangles = new ArrayList<>();
-        List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
 
         for (String rawLine : lines) {
             String line = removeComment(rawLine).trim();

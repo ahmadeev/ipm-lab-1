@@ -1,4 +1,4 @@
-package ru.ivk.lab4new.scene;
+package ru.ivk.lab4.scene;
 
 /**
  * Источник геометрии сцены для демонстрационного или ручного запуска.

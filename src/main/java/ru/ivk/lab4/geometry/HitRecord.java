@@ -2,8 +2,10 @@ package ru.ivk.lab4.geometry;
 
 import lombok.Getter;
 import ru.ivk.common.math.Vec3;
-import ru.ivk.lab4.material.Material;
 
+/**
+ * Результат ближайшего попадания луча в геометрию сцены.
+ */
 public final class HitRecord {
     private final Vec3 point;
     private final Vec3 normal;
@@ -14,7 +16,7 @@ public final class HitRecord {
 
     public HitRecord(Vec3 point, Vec3 normal, double t, Triangle triangle) {
         this.point = Vec3.copyOf(point);
-        this.normal = normal.normalize();
+        this.normal = Vec3.copyOf(normal);
         this.t = t;
         this.triangle = triangle;
     }
@@ -25,9 +27,5 @@ public final class HitRecord {
 
     public Vec3 getNormal() {
         return Vec3.copyOf(normal);
-    }
-
-    public Material getMaterial() {
-        return triangle.getMaterial();
     }
 }

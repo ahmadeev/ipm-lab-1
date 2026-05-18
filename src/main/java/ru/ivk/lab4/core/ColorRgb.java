@@ -1,10 +1,10 @@
 package ru.ivk.lab4.core;
 
-import ru.ivk.common.utils.Utils;
-
+/**
+ * RGB-цвет в вещественных компонентах для накопления яркости.
+ */
 public final class ColorRgb {
     public static final ColorRgb BLACK = new ColorRgb(0.0, 0.0, 0.0);
-    public static final ColorRgb WHITE = new ColorRgb(1.0, 1.0, 1.0);
 
     public final double r;
     public final double g;
@@ -20,40 +20,28 @@ public final class ColorRgb {
         return new ColorRgb(r + color.r, g + color.g, b + color.b);
     }
 
-    public ColorRgb sub(ColorRgb color) {
-        return new ColorRgb(r - color.r, g - color.g, b - color.b);
-    }
-
-    public ColorRgb mul(double scalar) {
-        return new ColorRgb(r * scalar, g * scalar, b * scalar);
+    public ColorRgb mul(double value) {
+        return new ColorRgb(r * value, g * value, b * value);
     }
 
     public ColorRgb mul(ColorRgb color) {
         return new ColorRgb(r * color.r, g * color.g, b * color.b);
     }
 
-    public ColorRgb div(double scalar) {
-        if (scalar == 0.0) {
-            throw new IllegalArgumentException("scalar must be non-zero");
+    public ColorRgb div(double value) {
+        if (value == 0.0) {
+            throw new IllegalArgumentException("division by zero");
         }
 
-        return mul(1.0 / scalar);
-    }
-
-    public ColorRgb clamp(double min, double max) {
-        return new ColorRgb(
-                Utils.clamp(r, min, max),
-                Utils.clamp(g, min, max),
-                Utils.clamp(b, min, max)
-        );
-    }
-
-    public double maxComponent() {
-        return Math.max(r, Math.max(g, b));
+        return new ColorRgb(r / value, g / value, b / value);
     }
 
     public double average() {
         return (r + g + b) / 3.0;
+    }
+
+    public double maxComponent() {
+        return Math.max(r, Math.max(g, b));
     }
 
     public boolean isBlack() {

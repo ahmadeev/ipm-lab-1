@@ -2,22 +2,39 @@ package ru.ivk.lab4.sampling;
 
 import lombok.Getter;
 import ru.ivk.common.math.Vec3;
+import ru.ivk.lab4.core.ColorRgb;
 import ru.ivk.lab4.geometry.Triangle;
 
-public final class LightSample {
-    @Getter
-    private final Triangle light;
-    private final Vec3 point;
-    @Getter
-    private final double lightPickProbability;
+import java.util.Objects;
 
-    public LightSample(Triangle light, Vec3 point, double lightPickProbability) {
-        this.light = light;
+/**
+ * Результат случайного выбора точки на протяженном треугольном источнике света.
+ */
+@Getter
+public final class LightSample {
+    private final Triangle light;
+    private final ColorRgb emission;
+    private final double selectionPdf;
+    private final double areaPdf;
+    private final double pdf;
+    private final Vec3 point;
+    private final Vec3 normal;
+
+    public LightSample(Triangle light, Vec3 point, Vec3 normal, ColorRgb emission, double selectionPdf, double areaPdf) {
+        this.light = Objects.requireNonNull(light, "light");
         this.point = Vec3.copyOf(point);
-        this.lightPickProbability = lightPickProbability;
+        this.normal = Vec3.copyOf(normal);
+        this.emission = Objects.requireNonNull(emission, "emission");
+        this.selectionPdf = selectionPdf;
+        this.areaPdf = areaPdf;
+        this.pdf = selectionPdf * areaPdf;
     }
 
     public Vec3 getPoint() {
         return Vec3.copyOf(point);
+    }
+
+    public Vec3 getNormal() {
+        return Vec3.copyOf(normal);
     }
 }

@@ -3,6 +3,11 @@ package ru.ivk.lab4.material;
 import lombok.Getter;
 import ru.ivk.lab4.core.ColorRgb;
 
+import java.util.Objects;
+
+/**
+ * Оптические свойства поверхности в RGB-компонентах.
+ */
 @Getter
 public final class Material {
     private final ColorRgb diffuse;
@@ -10,11 +15,11 @@ public final class Material {
     private final ColorRgb emission;
 
     public Material(ColorRgb diffuse, ColorRgb specular, ColorRgb emission) {
-        requirePhysical(diffuse, specular);
+        this.diffuse = Objects.requireNonNull(diffuse, "diffuse");
+        this.specular = Objects.requireNonNull(specular, "specular");
+        this.emission = Objects.requireNonNull(emission, "emission");
 
-        this.diffuse = diffuse;
-        this.specular = specular;
-        this.emission = emission;
+        requirePhysical(this.diffuse, this.specular);
     }
 
     public static Material diffuse(ColorRgb diffuse) {
@@ -35,14 +40,6 @@ public final class Material {
 
     public boolean isLight() {
         return !emission.isBlack();
-    }
-
-    public double diffuseWeight() {
-        return diffuse.average();
-    }
-
-    public double specularWeight() {
-        return specular.average();
     }
 
     private static void requirePhysical(ColorRgb diffuse, ColorRgb specular) {

@@ -1,44 +1,71 @@
 package ru.ivk.lab4.image;
 
+import ru.ivk.lab4.core.ColorRgb;
+import ru.ivk.lab4.core.RenderSettings;
+import ru.ivk.lab4.scene.SceneSource;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
+/**
+ * Записывает буфер изображения в простой текстовый PPM-файл.
+ */
 public final class PpmWriter {
     private PpmWriter() {
     }
 
-    public static void write(
-            ImageBuffer image,
-            Path outputPath,
-            NormalizationMode normalizationMode,
-            double fixedExposure,
-            double gamma
-    ) throws IOException {
-        Path parent = outputPath.getParent();
+    public static void write(ImageBuffer image, String outputPath) throws IOException {
+        write(image, new RenderSettings(
+                image.getWidth(),
+                image.getHeight(),
+                1,
+                1,
+                0,
+                1,
+                1.0,
+                NormalizationMode.NONE,
+                1.0,
+                ImageFormat.PPM,
+                SceneSource.CODE,
+                outputPath,
+                "cube.obj"
+        ));
+    }
+
+    public static void write(ImageBuffer image, RenderSettings settings) throws IOException {
+        write(image, settings, settings.getOutputPath());
+    }
+
+    public static void write(ImageBuffer image, RenderSettings settings, String outputPath) throws IOException {
+        Path path = Paths.get(outputPath);
+        Path parent = path.getParent();
 
         if (parent != null) {
             Files.createDirectories(parent);
         }
 
-        double exposure = ImageColorMapper.resolveExposure(image, normalizationMode, fixedExposure);
         StringBuilder builder = new StringBuilder();
+        builder.append("P3").append(System.lineSeparator());
+        builder.append(image.getWidth()).append(' ').append(image.getHeight()).append(System.lineSeparator());
+        builder.append(255).append(System.lineSeparator());
 
-        builder.append("P3\n");
-        builder.append(image.getWidth()).append(' ').append(image.getHeight()).append('\n');
-        builder.append("255\n");
+        ImageColorMapper mapper = new ImageColorMapper(image, settings);
 
         for (int y = image.getHeight() - 1; y >= 0; y--) {
             for (int x = 0; x < image.getWidth(); x++) {
-                int r = ImageColorMapper.toByte(image.getPixel(x, y), exposure, gamma, 0);
-                int g = ImageColorMapper.toByte(image.getPixel(x, y), exposure, gamma, 1);
-                int b = ImageColorMapper.toByte(image.getPixel(x, y), exposure, gamma, 2);
+                ColorRgb color = image.getPixel(x, y);
 
-                builder.append(r).append(' ').append(g).append(' ').append(b).append('\n');
+                builder.append(mapper.red(color)).append(' ')
+                        .append(mapper.green(color)).append(' ')
+                        .append(mapper.blue(color)).append(' ');
             }
+
+            builder.append(System.lineSeparator());
         }
 
-        Files.write(outputPath, builder.toString().getBytes(StandardCharsets.UTF_8));
+        Files.write(path, builder.toString().getBytes(StandardCharsets.UTF_8));
     }
 }

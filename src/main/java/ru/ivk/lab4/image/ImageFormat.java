@@ -1,4 +1,4 @@
-package ru.ivk.lab4new.image;
+package ru.ivk.lab4.image;
 
 /**
  * Формат файлов, которые нужно сохранить после завершения рендера.
