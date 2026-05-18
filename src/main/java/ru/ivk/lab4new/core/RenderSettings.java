@@ -1,6 +1,7 @@
 package ru.ivk.lab4new.core;
 
 import lombok.Getter;
+import ru.ivk.lab4new.image.NormalizationMode;
 
 import java.util.Objects;
 
@@ -14,7 +15,10 @@ public final class RenderSettings {
     private final int samplesPerPixel;
     private final int maxDepth;
     private final int russianRouletteStartDepth;
+    private final int threadCount;
     private final double gamma;
+    private final NormalizationMode normalizationMode;
+    private final double fixedExposure;
     private final String outputPath;
     private final String modelPath;
 
@@ -24,7 +28,10 @@ public final class RenderSettings {
             int samplesPerPixel,
             int maxDepth,
             int russianRouletteStartDepth,
+            int threadCount,
             double gamma,
+            NormalizationMode normalizationMode,
+            double fixedExposure,
             String outputPath,
             String modelPath
     ) {
@@ -44,8 +51,16 @@ public final class RenderSettings {
             throw new IllegalArgumentException("russian roulette start depth must be non-negative");
         }
 
+        if (threadCount <= 0) {
+            throw new IllegalArgumentException("thread count must be positive");
+        }
+
         if (gamma <= 0.0) {
             throw new IllegalArgumentException("gamma must be positive");
+        }
+
+        if (fixedExposure <= 0.0) {
+            throw new IllegalArgumentException("fixed exposure must be positive");
         }
 
         this.width = width;
@@ -53,7 +68,10 @@ public final class RenderSettings {
         this.samplesPerPixel = samplesPerPixel;
         this.maxDepth = maxDepth;
         this.russianRouletteStartDepth = russianRouletteStartDepth;
+        this.threadCount = threadCount;
         this.gamma = gamma;
+        this.normalizationMode = Objects.requireNonNull(normalizationMode, "normalizationMode");
+        this.fixedExposure = fixedExposure;
         this.outputPath = Objects.requireNonNull(outputPath, "outputPath");
         this.modelPath = Objects.requireNonNull(modelPath, "modelPath");
     }
@@ -62,10 +80,13 @@ public final class RenderSettings {
         return new RenderSettings(
                 500,
                 500,
-                2,
-                5,
-                2,
+                8,
+                8,
+                4,
+                1,
                 2.2,
+                NormalizationMode.FIXED,
+                1.0,
                 "helpers/output/lab-4new/demo.ppm",
                 "cube.obj"
         );

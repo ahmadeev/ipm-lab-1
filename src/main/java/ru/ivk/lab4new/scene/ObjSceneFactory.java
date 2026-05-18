@@ -10,6 +10,7 @@ import ru.ivk.lab4new.material.Material;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,12 @@ public final class ObjSceneFactory {
 
         if (inputStream != null) {
             return parser.parse(inputStream, material);
+        }
+
+        Path directPath = Path.of(settings.getModelPath());
+
+        if (Files.exists(directPath)) {
+            return parser.parse(directPath, material);
         }
 
         return parser.parse(Path.of("src/main/resources", settings.getModelPath()), material);

@@ -1,7 +1,7 @@
 package ru.ivk.lab4new.image;
 
-import ru.ivk.common.utils.Utils;
 import ru.ivk.lab4new.core.ColorRgb;
+import ru.ivk.lab4new.core.RenderSettings;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +17,23 @@ public final class PpmWriter {
     }
 
     public static void write(ImageBuffer image, String outputPath) throws IOException {
+        write(image, new RenderSettings(
+                image.getWidth(),
+                image.getHeight(),
+                1,
+                1,
+                0,
+                1,
+                1.0,
+                NormalizationMode.NONE,
+                1.0,
+                outputPath,
+                "cube.obj"
+        ));
+    }
+
+    public static void write(ImageBuffer image, RenderSettings settings) throws IOException {
+        String outputPath = settings.getOutputPath();
         Path path = Paths.get(outputPath);
         Path parent = path.getParent();
 
@@ -29,22 +46,20 @@ public final class PpmWriter {
         builder.append(image.getWidth()).append(' ').append(image.getHeight()).append(System.lineSeparator());
         builder.append(255).append(System.lineSeparator());
 
+        ImageColorMapper mapper = new ImageColorMapper(image, settings);
+
         for (int y = image.getHeight() - 1; y >= 0; y--) {
             for (int x = 0; x < image.getWidth(); x++) {
                 ColorRgb color = image.getPixel(x, y);
 
-                builder.append(toByte(color.r)).append(' ')
-                        .append(toByte(color.g)).append(' ')
-                        .append(toByte(color.b)).append(' ');
+                builder.append(mapper.red(color)).append(' ')
+                        .append(mapper.green(color)).append(' ')
+                        .append(mapper.blue(color)).append(' ');
             }
 
             builder.append(System.lineSeparator());
         }
 
         Files.write(path, builder.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static int toByte(double value) {
-        return (int) Math.round(Utils.clamp(value, 0.0, 1.0) * 255.0);
     }
 }
