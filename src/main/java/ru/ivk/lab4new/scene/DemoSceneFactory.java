@@ -27,6 +27,7 @@ public final class DemoSceneFactory {
         );
         Material leftMaterial = Material.diffuse(new ColorRgb(0.75, 0.18, 0.16));
         Material rightMaterial = Material.diffuse(new ColorRgb(0.16, 0.32, 0.75));
+        Material lightMaterial = Material.light(new ColorRgb(1.0, 0.9, 0.55));
         Scene scene = new Scene(Arrays.asList(
                 new Triangle(
                         new Vec3(-0.9, -0.6, -1.8),
@@ -39,6 +40,18 @@ public final class DemoSceneFactory {
                         new Vec3(0.9, 0.6, -1.8),
                         new Vec3(-0.9, 0.6, -1.8),
                         leftMaterial
+                ),
+                new Triangle(
+                        new Vec3(-0.25, 0.85, -1.7),
+                        new Vec3(0.25, 0.85, -1.7),
+                        new Vec3(0.25, 0.65, -1.7),
+                        lightMaterial
+                ),
+                new Triangle(
+                        new Vec3(-0.25, 0.85, -1.7),
+                        new Vec3(0.25, 0.65, -1.7),
+                        new Vec3(-0.25, 0.65, -1.7),
+                        lightMaterial
                 )
         ));
 

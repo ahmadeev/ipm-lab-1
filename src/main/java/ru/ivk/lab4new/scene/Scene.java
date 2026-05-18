@@ -17,6 +17,7 @@ import java.util.Optional;
 @Getter
 public final class Scene {
     private final List<Triangle> triangles;
+    private final List<Triangle> lights;
 
     public Scene(List<Triangle> triangles) {
         Objects.requireNonNull(triangles, "triangles");
@@ -26,6 +27,7 @@ public final class Scene {
         }
 
         this.triangles = Collections.unmodifiableList(new ArrayList<>(triangles));
+        this.lights = Collections.unmodifiableList(collectLights(this.triangles));
     }
 
     public Optional<HitRecord> intersect(Ray ray, double tMin, double tMax) {
@@ -42,5 +44,17 @@ public final class Scene {
         }
 
         return Optional.ofNullable(closestHit);
+    }
+
+    private List<Triangle> collectLights(List<Triangle> triangles) {
+        List<Triangle> lightTriangles = new ArrayList<>();
+
+        for (Triangle triangle : triangles) {
+            if (triangle.getMaterial().isLight()) {
+                lightTriangles.add(triangle);
+            }
+        }
+
+        return lightTriangles;
     }
 }
