@@ -15,6 +15,7 @@ public final class RenderSettings {
     private final int maxDepth;
     private final double gamma;
     private final String outputPath;
+    private final String modelPath;
 
     public RenderSettings(
             int width,
@@ -22,7 +23,8 @@ public final class RenderSettings {
             int samplesPerPixel,
             int maxDepth,
             double gamma,
-            String outputPath
+            String outputPath,
+            String modelPath
     ) {
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("image size must be positive");
@@ -46,6 +48,7 @@ public final class RenderSettings {
         this.maxDepth = maxDepth;
         this.gamma = gamma;
         this.outputPath = Objects.requireNonNull(outputPath, "outputPath");
+        this.modelPath = Objects.requireNonNull(modelPath, "modelPath");
     }
 
     public static RenderSettings demo() {
@@ -53,9 +56,10 @@ public final class RenderSettings {
                 500,
                 500,
                 2,
-                1,
+                2,
                 2.2,
-                "helpers/output/lab-4new/demo.ppm"
+                "helpers/output/lab-4new/demo.ppm",
+                "cube.obj"
         );
     }
 }

@@ -4,7 +4,7 @@ import ru.ivk.lab4new.core.RenderSettings;
 import ru.ivk.lab4new.image.ImageBuffer;
 import ru.ivk.lab4new.image.PpmWriter;
 import ru.ivk.lab4new.render.Renderer;
-import ru.ivk.lab4new.scene.DemoSceneFactory;
+import ru.ivk.lab4new.scene.ObjSceneFactory;
 import ru.ivk.lab4new.scene.RenderJob;
 
 import java.io.IOException;
@@ -27,14 +27,15 @@ public class Main {
 
     private static void runDemo() throws IOException {
         RenderSettings settings = RenderSettings.demo();
-        RenderJob job = DemoSceneFactory.create(settings);
+        RenderJob job = ObjSceneFactory.create(settings);
 
         System.out.printf(
-                "Render: %dx%d, spp=%d, maxDepth=%d, output=%s%n",
+                "Render: %dx%d, spp=%d, maxDepth=%d, model=%s, output=%s%n",
                 job.getSettings().getWidth(),
                 job.getSettings().getHeight(),
                 job.getSettings().getSamplesPerPixel(),
                 job.getSettings().getMaxDepth(),
+                job.getSettings().getModelPath(),
                 job.getSettings().getOutputPath()
         );
 
