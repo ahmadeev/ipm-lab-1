@@ -2,6 +2,7 @@ package ru.ivk.lab4new.image;
 
 import ru.ivk.lab4new.core.ColorRgb;
 import ru.ivk.lab4new.core.RenderSettings;
+import ru.ivk.lab4new.scene.SceneSource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +29,7 @@ public final class PpmWriter {
                 NormalizationMode.NONE,
                 1.0,
                 ImageFormat.PPM,
+                SceneSource.CODE,
                 outputPath,
                 "cube.obj"
         ));

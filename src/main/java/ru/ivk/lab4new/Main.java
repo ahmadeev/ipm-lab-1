@@ -5,8 +5,10 @@ import ru.ivk.lab4new.core.RenderSettings;
 import ru.ivk.lab4new.image.ImageBuffer;
 import ru.ivk.lab4new.image.ImageWriter;
 import ru.ivk.lab4new.render.Renderer;
+import ru.ivk.lab4new.scene.DemoSceneFactory;
 import ru.ivk.lab4new.scene.ObjSceneFactory;
 import ru.ivk.lab4new.scene.RenderJob;
+import ru.ivk.lab4new.scene.SceneSource;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -42,10 +44,12 @@ public class Main {
     }
 
     private static void render(RenderSettings settings) throws IOException {
-        RenderJob job = ObjSceneFactory.create(settings);
+        RenderJob job = settings.getSceneSource() == SceneSource.CODE
+                ? DemoSceneFactory.create(settings)
+                : ObjSceneFactory.create(settings);
 
         System.out.printf(
-                "Render: %dx%d, spp=%d, maxDepth=%d, rrStart=%d, threads=%d, gamma=%.3f, normalization=%s, exposure=%.3f, format=%s, model=%s, output=%s%n",
+                "Render: %dx%d, spp=%d, maxDepth=%d, rrStart=%d, threads=%d, gamma=%.3f, normalization=%s, exposure=%.3f, format=%s, scene=%s, model=%s, output=%s%n",
                 job.getSettings().getWidth(),
                 job.getSettings().getHeight(),
                 job.getSettings().getSamplesPerPixel(),
@@ -56,6 +60,7 @@ public class Main {
                 job.getSettings().getNormalizationMode(),
                 job.getSettings().getFixedExposure(),
                 job.getSettings().getImageFormat(),
+                job.getSettings().getSceneSource(),
                 job.getSettings().getModelPath(),
                 job.getSettings().getOutputPath()
         );

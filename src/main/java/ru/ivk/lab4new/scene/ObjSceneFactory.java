@@ -23,11 +23,17 @@ public final class ObjSceneFactory {
     }
 
     public static RenderJob create(RenderSettings settings) throws IOException {
+        return create(settings, settings.getSceneSource() == SceneSource.PATH);
+    }
+
+    private static RenderJob create(RenderSettings settings, boolean pathMode) throws IOException {
         Material importedMaterial = Material.mixed(
                 new ColorRgb(0.58, 0.58, 0.54),
                 new ColorRgb(0.18, 0.18, 0.18)
         );
-        List<Triangle> triangles = new ArrayList<>(loadModel(settings, importedMaterial));
+        List<Triangle> triangles = new ArrayList<>(pathMode
+                ? loadModelFromPath(settings, importedMaterial)
+                : loadModelFromResource(settings, importedMaterial));
 
         Material floor = Material.diffuse(new ColorRgb(0.65, 0.65, 0.62));
         Material light = Material.light(new ColorRgb(9.0, 8.4, 6.8));
@@ -47,7 +53,7 @@ public final class ObjSceneFactory {
         return new RenderJob(settings, camera, new Scene(triangles));
     }
 
-    private static List<Triangle> loadModel(RenderSettings settings, Material material) throws IOException {
+    private static List<Triangle> loadModelFromResource(RenderSettings settings, Material material) throws IOException {
         ObjParser parser = new ObjParser();
         InputStream inputStream = ObjSceneFactory.class.getClassLoader().getResourceAsStream(settings.getModelPath());
 
@@ -55,13 +61,18 @@ public final class ObjSceneFactory {
             return parser.parse(inputStream, material);
         }
 
+        return parser.parse(Path.of("src/main/resources", settings.getModelPath()), material);
+    }
+
+    private static List<Triangle> loadModelFromPath(RenderSettings settings, Material material) throws IOException {
+        ObjParser parser = new ObjParser();
         Path directPath = Path.of(settings.getModelPath());
 
         if (Files.exists(directPath)) {
             return parser.parse(directPath, material);
         }
 
-        return parser.parse(Path.of("src/main/resources", settings.getModelPath()), material);
+        return parser.parse(directPath, material);
     }
 
     private static void addQuad(List<Triangle> triangles, Vec3 v0, Vec3 v1, Vec3 v2, Vec3 v3, Material material) {

@@ -3,6 +3,7 @@ package ru.ivk.lab4new.cli;
 import ru.ivk.lab4new.core.RenderSettings;
 import ru.ivk.lab4new.image.ImageFormat;
 import ru.ivk.lab4new.image.NormalizationMode;
+import ru.ivk.lab4new.scene.SceneSource;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -20,10 +21,8 @@ public final class ConsoleInput {
 
     public RenderSettings readSettings(RenderSettings defaults) {
         System.out.println("Manual render settings. Press Enter to keep default value.");
-        String sceneMode = readString("Scene mode: demo or obj", "demo");
-        String modelPath = "obj".equalsIgnoreCase(sceneMode)
-                ? readString("OBJ resource/path", defaults.getModelPath())
-                : defaults.getModelPath();
+        SceneSource sceneSource = readSceneSource(defaults.getSceneSource());
+        String modelPath = readModelPath(sceneSource, defaults.getModelPath());
 
         int width = readInt("Width", defaults.getWidth());
         int height = readInt("Height", defaults.getHeight());
@@ -48,6 +47,7 @@ public final class ConsoleInput {
                 normalizationMode,
                 fixedExposure,
                 imageFormat,
+                sceneSource,
                 outputPath,
                 modelPath
         );
@@ -106,5 +106,29 @@ public final class ConsoleInput {
                 System.out.println("Enter PNG, PPM, or BOTH.");
             }
         }
+    }
+
+    private SceneSource readSceneSource(SceneSource defaultValue) {
+        while (true) {
+            String value = readString("Scene source: CODE, RESOURCE, PATH", defaultValue.name());
+
+            try {
+                return SceneSource.valueOf(value.toUpperCase(Locale.US));
+            } catch (IllegalArgumentException exception) {
+                System.out.println("Enter CODE, RESOURCE, or PATH.");
+            }
+        }
+    }
+
+    private String readModelPath(SceneSource sceneSource, String defaultValue) {
+        if (sceneSource == SceneSource.RESOURCE) {
+            return readString("OBJ resource name", defaultValue);
+        }
+
+        if (sceneSource == SceneSource.PATH) {
+            return readString("OBJ file path", defaultValue);
+        }
+
+        return defaultValue;
     }
 }
