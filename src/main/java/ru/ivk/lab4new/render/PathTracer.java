@@ -45,8 +45,8 @@ public final class PathTracer {
         }
 
         // расчет света
-        return directLighting(scene, hit.get(), material, sampler)
-                .add(indirectBounce(scene, ray, hit.get(), material, sampler, depth, russianRouletteStartDepth, bounce));
+        return directLighting(scene, hit.get(), material, sampler);
+                //.add(indirectBounce(scene, ray, hit.get(), material, sampler, depth, russianRouletteStartDepth, bounce));
     }
 
     private ColorRgb directLighting(Scene scene, HitRecord hit, Material material, Sampler sampler) {
@@ -77,7 +77,9 @@ public final class PathTracer {
 
         Ray shadowRay = new Ray(hitPoint.add(hitNormal.mul(EPSILON)), lightDirection);
 
-        if (scene.isOccluded(shadowRay, EPSILON, distance - EPSILON)) {
+        Optional<HitRecord> shadowHit = scene.intersect(shadowRay, EPSILON, distance - EPSILON);
+
+        if (shadowHit.isPresent() && shadowHit.get().getTriangle() != light.getLight()) {
             return ColorRgb.BLACK;
         }
 
