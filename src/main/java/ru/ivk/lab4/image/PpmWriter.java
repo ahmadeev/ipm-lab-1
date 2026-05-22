@@ -31,7 +31,7 @@ public final class PpmWriter {
                 ImageFormat.PPM,
                 SceneSource.CODE,
                 outputPath,
-                "cube.obj"
+                "lab-4/cube.obj"
         ));
     }
 

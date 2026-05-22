@@ -97,8 +97,8 @@ public final class RenderSettings {
                 1.0,
                 ImageFormat.BOTH,
                 SceneSource.CODE,
-                "output/lab4-demo",
-                "cube.obj"
+                "output/lab-4/demo",
+                "lab-4/cube.obj"
         );
     }
 }
