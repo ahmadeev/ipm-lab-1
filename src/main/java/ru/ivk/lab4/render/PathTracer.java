@@ -40,7 +40,7 @@ public final class PathTracer {
         Material material = hit.get().getTriangle().getMaterial();
 
         // пересечение -- свет
-        if (material.isLight()) {
+        if (material.isLight() && bounce == 0) {
             return material.getEmission();
         }
 
