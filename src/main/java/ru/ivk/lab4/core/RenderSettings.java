@@ -86,8 +86,8 @@ public final class RenderSettings {
 
     public static RenderSettings demo() {
         return new RenderSettings(
-                500,
-                500,
+                1000,
+                1000,
                 24,
                 8,
                 4,
