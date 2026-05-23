@@ -25,6 +25,44 @@ public final class PathTracer {
         return trace(scene, ray, sampler, depth, russianRouletteStartDepth, 0);
     }
 
+    public PathTraceResult tracePrimary(Scene scene, Ray ray, Sampler sampler, int depth, int russianRouletteStartDepth) {
+        if (depth <= 0) {
+            return PathTraceResult.background(ColorRgb.BLACK);
+        }
+
+        Optional<HitRecord> hit = scene.intersect(ray, EPSILON, Double.POSITIVE_INFINITY);
+
+        // пересечение не найдено
+        if (!hit.isPresent()) {
+            return PathTraceResult.background(directionColor(ray.getDirection()));
+        }
+
+        HitRecord hitRecord = hit.get();
+        Material material = hitRecord.getTriangle().getMaterial();
+
+        // пересечение -- свет
+        if (material.isLight()) {
+            return PathTraceResult.surface(
+                    material.getEmission(),
+                    ColorRgb.BLACK,
+                    hitRecord.getT(),
+                    hitRecord.getNormal(),
+                    hitRecord.getTriangle().getObjectId()
+            );
+        }
+
+        ColorRgb direct = directLighting(scene, hitRecord, material, sampler);
+        ColorRgb indirect = indirectBounce(scene, ray, hitRecord, material, sampler, depth, russianRouletteStartDepth, 0);
+
+        return PathTraceResult.surface(
+                direct,
+                indirect,
+                hitRecord.getT(),
+                hitRecord.getNormal(),
+                hitRecord.getTriangle().getObjectId()
+        );
+    }
+
     private ColorRgb trace(Scene scene, Ray ray, Sampler sampler, int depth, int russianRouletteStartDepth, int bounce) {
         if (depth <= 0) {
             return ColorRgb.BLACK;
