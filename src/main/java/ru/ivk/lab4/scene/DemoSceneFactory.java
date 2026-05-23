@@ -26,11 +26,17 @@ public final class DemoSceneFactory {
         Material cube = Material.mixed(new ColorRgb(0.28, 0.42, 0.28), new ColorRgb(0.42, 0.42, 0.42));
         Material light = Material.light(new ColorRgb(8.0, 7.2, 5.6));
 
-        addQuad(triangles, new Vec3(-3, 0, -3), new Vec3(3, 0, -3), new Vec3(3, 0, 3), new Vec3(-3, 0, 3), floor);
-        addQuad(triangles, new Vec3(-3, 0, -3), new Vec3(-3, 0, 3), new Vec3(-3, 3, 3), new Vec3(-3, 3, -3), leftWall);
-        addQuad(triangles, new Vec3(-3, 0, 3), new Vec3(3, 0, 3), new Vec3(3, 3, 3), new Vec3(-3, 3, 3), backWall);
-        addCube(triangles, new Vec3(-0.7, 0.0, -0.2), new Vec3(0.7, 1.4, 1.2), cube);
-        addQuad(triangles, new Vec3(-0.8, 2.85, 0.1), new Vec3(0.8, 2.85, 0.1), new Vec3(0.8, 2.85, 1.1), new Vec3(-0.8, 2.85, 1.1), light);
+        SceneObject floorObject = new SceneObject(1, "floor");
+        SceneObject leftWallObject = new SceneObject(2, "leftWall");
+        SceneObject backWallObject = new SceneObject(3, "backWall");
+        SceneObject cubeObject = new SceneObject(4, "cube");
+        SceneObject lightObject = new SceneObject(5, "light");
+
+        addQuad(triangles, new Vec3(-3, 0, -3), new Vec3(3, 0, -3), new Vec3(3, 0, 3), new Vec3(-3, 0, 3), floor, floorObject);
+        addQuad(triangles, new Vec3(-3, 0, -3), new Vec3(-3, 0, 3), new Vec3(-3, 3, 3), new Vec3(-3, 3, -3), leftWall, leftWallObject);
+        addQuad(triangles, new Vec3(-3, 0, 3), new Vec3(3, 0, 3), new Vec3(3, 3, 3), new Vec3(-3, 3, 3), backWall, backWallObject);
+        addCube(triangles, new Vec3(-0.7, 0.0, -0.2), new Vec3(0.7, 1.4, 1.2), cube, cubeObject);
+        addQuad(triangles, new Vec3(-0.8, 2.85, 0.1), new Vec3(0.8, 2.85, 0.1), new Vec3(0.8, 2.85, 1.1), new Vec3(-0.8, 2.85, 1.1), light, lightObject);
 
         double aspectRatio = settings.getWidth() / (double) settings.getHeight();
         // x -- вправо, y -- вверх, z -- вглубь
@@ -45,12 +51,20 @@ public final class DemoSceneFactory {
         return new RenderJob(settings, camera, new Scene(triangles));
     }
 
-    private static void addQuad(List<Triangle> triangles, Vec3 v0, Vec3 v1, Vec3 v2, Vec3 v3, Material material) {
-        triangles.add(new Triangle(v0, v1, v2, material));
-        triangles.add(new Triangle(v0, v2, v3, material));
+    private static void addQuad(
+            List<Triangle> triangles,
+            Vec3 v0,
+            Vec3 v1,
+            Vec3 v2,
+            Vec3 v3,
+            Material material,
+            SceneObject sceneObject
+    ) {
+        triangles.add(new Triangle(v0, v1, v2, material, sceneObject));
+        triangles.add(new Triangle(v0, v2, v3, material, sceneObject));
     }
 
-    private static void addCube(List<Triangle> triangles, Vec3 min, Vec3 max, Material material) {
+    private static void addCube(List<Triangle> triangles, Vec3 min, Vec3 max, Material material, SceneObject sceneObject) {
         Vec3 p000 = new Vec3(min.x, min.y, min.z);
         Vec3 p001 = new Vec3(min.x, min.y, max.z);
         Vec3 p010 = new Vec3(min.x, max.y, min.z);
@@ -60,11 +74,11 @@ public final class DemoSceneFactory {
         Vec3 p110 = new Vec3(max.x, max.y, min.z);
         Vec3 p111 = new Vec3(max.x, max.y, max.z);
 
-        addQuad(triangles, p000, p010, p110, p100, material);
-        addQuad(triangles, p001, p101, p111, p011, material);
-        addQuad(triangles, p000, p001, p011, p010, material);
-        addQuad(triangles, p100, p110, p111, p101, material);
-        addQuad(triangles, p010, p011, p111, p110, material);
-        addQuad(triangles, p000, p100, p101, p001, material);
+        addQuad(triangles, p000, p010, p110, p100, material, sceneObject);
+        addQuad(triangles, p001, p101, p111, p011, material, sceneObject);
+        addQuad(triangles, p000, p001, p011, p010, material, sceneObject);
+        addQuad(triangles, p100, p110, p111, p101, material, sceneObject);
+        addQuad(triangles, p010, p011, p111, p110, material, sceneObject);
+        addQuad(triangles, p000, p100, p101, p001, material, sceneObject);
     }
 }

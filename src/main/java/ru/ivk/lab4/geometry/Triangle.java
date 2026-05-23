@@ -4,6 +4,7 @@ import lombok.Getter;
 import ru.ivk.common.math.Vec3;
 import ru.ivk.lab4.core.Ray;
 import ru.ivk.lab4.material.Material;
+import ru.ivk.lab4.scene.SceneObject;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -22,12 +23,19 @@ public final class Triangle {
     private final double area;
     @Getter
     private final Material material;
+    @Getter
+    private final SceneObject sceneObject;
 
     public Triangle(Vec3 v0, Vec3 v1, Vec3 v2, Material material) {
+        this(v0, v1, v2, material, SceneObject.UNKNOWN);
+    }
+
+    public Triangle(Vec3 v0, Vec3 v1, Vec3 v2, Material material, SceneObject sceneObject) {
         this.v0 = Vec3.copyOf(v0);
         this.v1 = Vec3.copyOf(v1);
         this.v2 = Vec3.copyOf(v2);
         this.material = Objects.requireNonNull(material, "material");
+        this.sceneObject = Objects.requireNonNull(sceneObject, "sceneObject");
 
         Vec3 cross = this.v1.sub(this.v0).cross(this.v2.sub(this.v0));
         double crossLength = cross.length();
@@ -66,6 +74,10 @@ public final class Triangle {
 
     public Vec3 getNormal() {
         return Vec3.copyOf(normal);
+    }
+
+    public int getObjectId() {
+        return sceneObject.getId();
     }
 
     public Vec3 samplePoint(double xi1, double xi2) {
