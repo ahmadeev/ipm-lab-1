@@ -19,6 +19,31 @@ public final class BilateralFilter {
         this.settings = Objects.requireNonNull(settings, "settings");
     }
 
+    public RenderDataBuffer apply(RenderDataBuffer source) {
+        Objects.requireNonNull(source, "source");
+
+        RenderDataBuffer filtered = new RenderDataBuffer(source.getWidth(), source.getHeight());
+
+        for (int y = 0; y < source.getHeight(); y++) {
+            for (int x = 0; x < source.getWidth(); x++) {
+                PixelRenderData center = source.getPixel(x, y);
+                ColorRgb filteredIndirect = filterIndirectAt(source, x, y);
+
+                filtered.setPixel(x, y, new PixelRenderData(
+                        center.getDirect(),
+                        filteredIndirect,
+                        center.getDirect().add(filteredIndirect),
+                        center.getDepth(),
+                        center.getNormal(),
+                        center.getObjectId(),
+                        center.isHit()
+                ));
+            }
+        }
+
+        return filtered;
+    }
+
     ColorRgb filterIndirectAt(RenderDataBuffer source, int x, int y) {
         PixelRenderData center = source.getPixel(x, y);
 
