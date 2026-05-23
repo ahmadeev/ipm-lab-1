@@ -65,7 +65,11 @@ public class Main {
                 job.getSettings().getOutputPath()
         );
 
+        long renderStart = System.nanoTime();
         ImageBuffer image = new Renderer().render(job.getScene(), job.getCamera(), job.getSettings());
+        long renderElapsedNanos = System.nanoTime() - renderStart;
+
+        System.out.printf("Render time: %.3f s%n", renderElapsedNanos / 1_000_000_000.0);
         ImageWriter.write(image, job.getSettings());
         System.out.printf("Saved: %s%n", job.getSettings().getOutputPath());
     }
