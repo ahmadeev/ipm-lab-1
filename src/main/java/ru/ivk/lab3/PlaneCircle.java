@@ -117,6 +117,9 @@ public class PlaneCircle {
                 pointsOutsideCircle++;
             }
 
+            //   pi * r_{k+1}^2 - pi * r_k^2
+            //  = pi * Rc^2 * ((k+1)/K - k/K)
+            //  = pi * Rc^2 / K
             double rho = Utils.clamp((radialDistance * radialDistance) / (circleRadius * circleRadius), 0.0, 1.0);
             int ringIndex = mapRhoToRingIndex(rho);
             ringCounts[ringIndex]++;
