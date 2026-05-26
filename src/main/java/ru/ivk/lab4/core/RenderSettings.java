@@ -93,7 +93,7 @@ public final class RenderSettings {
                 4,
                 Math.max(1, Runtime.getRuntime().availableProcessors() - 1),
                 2.2,
-                NormalizationMode.MAX,
+                NormalizationMode.FIXED,
                 1.0,
                 ImageFormat.BOTH,
                 SceneSource.CODE,
