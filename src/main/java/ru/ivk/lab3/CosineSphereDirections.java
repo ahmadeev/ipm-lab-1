@@ -62,7 +62,8 @@ public class CosineSphereDirections {
         double sumX = 0.0;
         double sumY = 0.0;
         double sumZ = 0.0;
-        int[] muBinCounts = new int[MU_BIN_COUNT];
+        int[] rhoBinCounts = new int[MU_BIN_COUNT];
+//        int[] muBinCounts = new int[MU_BIN_COUNT];
 
         for (Vec3 direction : directions) {
             double length = direction.length();
@@ -85,27 +86,43 @@ public class CosineSphereDirections {
                 directionsBelowSphere++;
             }
 
-            int muBinIndex = mapMuToBinIndex(Utils.clamp(mu, 0.0, 1.0));
-            muBinCounts[muBinIndex]++;
+            double rho = Utils.clamp(mu * mu, 0.0, 1.0);
+            int rhoBinIndex = mapUnitIntervalToBinIndex(rho);
+            rhoBinCounts[rhoBinIndex]++;
+
+//            int muBinIndex = mapUnitIntervalToBinIndex(Utils.clamp(mu, 0.0, 1.0));
+//            muBinCounts[muBinIndex]++;
         }
 
-        double[] expectedMuBinCounts = new double[MU_BIN_COUNT];
-        double maxMuBinAbsoluteDeviation = 0.0;
-        double maxMuBinRelativeDeviation = 0.0;
+        double expectedRhoBinCount = directions.size() / (double) MU_BIN_COUNT;
+        double maxRhoBinAbsoluteDeviation = 0.0;
+        double maxRhoBinRelativeDeviation = 0.0;
 
-        for (int i = 0; i < MU_BIN_COUNT; i++) {
-            double binStart = i / (double) MU_BIN_COUNT;
-            double binEnd = (i + 1) / (double) MU_BIN_COUNT;
-            double expectedCount = directions.size() * (binEnd * binEnd - binStart * binStart);
+        for (int rhoBinCount : rhoBinCounts) {
+            double absoluteDeviation = Math.abs(rhoBinCount - expectedRhoBinCount);
+            double relativeDeviation = absoluteDeviation / expectedRhoBinCount;
 
-            expectedMuBinCounts[i] = expectedCount;
-
-            double absoluteDeviation = Math.abs(muBinCounts[i] - expectedCount);
-            double relativeDeviation = absoluteDeviation / expectedCount;
-
-            maxMuBinAbsoluteDeviation = Math.max(maxMuBinAbsoluteDeviation, absoluteDeviation);
-            maxMuBinRelativeDeviation = Math.max(maxMuBinRelativeDeviation, relativeDeviation);
+            maxRhoBinAbsoluteDeviation = Math.max(maxRhoBinAbsoluteDeviation, absoluteDeviation);
+            maxRhoBinRelativeDeviation = Math.max(maxRhoBinRelativeDeviation, relativeDeviation);
         }
+
+//        double[] expectedMuBinCounts = new double[MU_BIN_COUNT];
+//        double maxMuBinAbsoluteDeviation = 0.0;
+//        double maxMuBinRelativeDeviation = 0.0;
+//
+//        for (int i = 0; i < MU_BIN_COUNT; i++) {
+//            double binStart = i / (double) MU_BIN_COUNT;
+//            double binEnd = (i + 1) / (double) MU_BIN_COUNT;
+//            double expectedCount = directions.size() * (binEnd * binEnd - binStart * binStart);
+//
+//            expectedMuBinCounts[i] = expectedCount;
+//
+//            double absoluteDeviation = Math.abs(muBinCounts[i] - expectedCount);
+//            double relativeDeviation = absoluteDeviation / expectedCount;
+//
+//            maxMuBinAbsoluteDeviation = Math.max(maxMuBinAbsoluteDeviation, absoluteDeviation);
+//            maxMuBinRelativeDeviation = Math.max(maxMuBinRelativeDeviation, relativeDeviation);
+//        }
 
         double meanResultantLength = Math.sqrt(sumX * sumX + sumY * sumY + sumZ * sumZ) / directions.size();
 
@@ -115,10 +132,10 @@ public class CosineSphereDirections {
                 maxLengthDeviation,
                 minDotWithNormal,
                 meanResultantLength,
-                muBinCounts,
-                expectedMuBinCounts,
-                maxMuBinAbsoluteDeviation,
-                maxMuBinRelativeDeviation
+                rhoBinCounts,
+                expectedRhoBinCount,
+                maxRhoBinAbsoluteDeviation,
+                maxRhoBinRelativeDeviation
         );
     }
 
@@ -147,10 +164,14 @@ public class CosineSphereDirections {
         System.out.printf("Макс. отклонение длины: %.12f%n", validation.maxLengthDeviation);
         System.out.printf("Мин. dot(dir, N): %.12f%n", validation.minDotWithNormal);
         System.out.printf("Средняя длина результирующего вектора: %.12f%n", validation.meanResultantLength);
-        System.out.printf("Ожидаемые числа по mu-бинам: %s%n", formatDoubleArray(validation.expectedMuBinCounts));
-        System.out.printf("Фактические числа по mu-бинам: %s%n", Arrays.toString(validation.muBinCounts));
-        System.out.printf("Макс. абсолютное отклонение по mu-бинам: %.2f%n", validation.maxMuBinAbsoluteDeviation);
-        System.out.printf("Макс. относительное отклонение по mu-бинам: %.6f%n", validation.maxMuBinRelativeDeviation);
+        System.out.printf("Ожидаемое число в каждом rho-бине: %.2f%n", validation.expectedRhoBinCount);
+        System.out.printf("Фактические числа по rho-бинам: %s%n", Arrays.toString(validation.rhoBinCounts));
+        System.out.printf("Макс. абсолютное отклонение по rho-бинам: %.2f%n", validation.maxRhoBinAbsoluteDeviation);
+        System.out.printf("Макс. относительное отклонение по rho-бинам: %.6f%n", validation.maxRhoBinRelativeDeviation);
+//        System.out.printf("Ожидаемые числа по mu-бинам: %s%n", formatDoubleArray(validation.expectedMuBinCounts));
+//        System.out.printf("Фактические числа по mu-бинам: %s%n", Arrays.toString(validation.muBinCounts));
+//        System.out.printf("Макс. абсолютное отклонение по mu-бинам: %.2f%n", validation.maxMuBinAbsoluteDeviation);
+//        System.out.printf("Макс. относительное отклонение по mu-бинам: %.6f%n", validation.maxMuBinRelativeDeviation);
         System.out.println();
     }
 
@@ -184,14 +205,14 @@ public class CosineSphereDirections {
         return new Vec3(0, 0, 1);
     }
 
-    private static int mapMuToBinIndex(double mu) {
-        int muBinIndex = (int) (mu * MU_BIN_COUNT);
+    private static int mapUnitIntervalToBinIndex(double value) {
+        int binIndex = (int) (value * MU_BIN_COUNT);
 
-        if (muBinIndex == MU_BIN_COUNT) {
+        if (binIndex == MU_BIN_COUNT) {
             return MU_BIN_COUNT - 1;
         }
 
-        return muBinIndex;
+        return binIndex;
     }
 
     private static String formatDoubleArray(double[] values) {
@@ -215,10 +236,14 @@ public class CosineSphereDirections {
         private final double maxLengthDeviation;
         private final double minDotWithNormal;
         private final double meanResultantLength;
-        private final int[] muBinCounts;
-        private final double[] expectedMuBinCounts;
-        private final double maxMuBinAbsoluteDeviation;
-        private final double maxMuBinRelativeDeviation;
+        private final int[] rhoBinCounts;
+        private final double expectedRhoBinCount;
+        private final double maxRhoBinAbsoluteDeviation;
+        private final double maxRhoBinRelativeDeviation;
+//        private final int[] muBinCounts;
+//        private final double[] expectedMuBinCounts;
+//        private final double maxMuBinAbsoluteDeviation;
+//        private final double maxMuBinRelativeDeviation;
 
         private ValidationResult(
                 int directionsOffUnitSphere,
@@ -226,20 +251,24 @@ public class CosineSphereDirections {
                 double maxLengthDeviation,
                 double minDotWithNormal,
                 double meanResultantLength,
-                int[] muBinCounts,
-                double[] expectedMuBinCounts,
-                double maxMuBinAbsoluteDeviation,
-                double maxMuBinRelativeDeviation
+                int[] rhoBinCounts,
+                double expectedRhoBinCount,
+                double maxRhoBinAbsoluteDeviation,
+                double maxRhoBinRelativeDeviation
         ) {
             this.directionsOffUnitSphere = directionsOffUnitSphere;
             this.directionsBelowHemisphere = directionsBelowHemisphere;
             this.maxLengthDeviation = maxLengthDeviation;
             this.minDotWithNormal = minDotWithNormal;
             this.meanResultantLength = meanResultantLength;
-            this.muBinCounts = Arrays.copyOf(muBinCounts, muBinCounts.length);
-            this.expectedMuBinCounts = Arrays.copyOf(expectedMuBinCounts, expectedMuBinCounts.length);
-            this.maxMuBinAbsoluteDeviation = maxMuBinAbsoluteDeviation;
-            this.maxMuBinRelativeDeviation = maxMuBinRelativeDeviation;
+            this.rhoBinCounts = Arrays.copyOf(rhoBinCounts, rhoBinCounts.length);
+            this.expectedRhoBinCount = expectedRhoBinCount;
+            this.maxRhoBinAbsoluteDeviation = maxRhoBinAbsoluteDeviation;
+            this.maxRhoBinRelativeDeviation = maxRhoBinRelativeDeviation;
+//            this.muBinCounts = Arrays.copyOf(muBinCounts, muBinCounts.length);
+//            this.expectedMuBinCounts = Arrays.copyOf(expectedMuBinCounts, expectedMuBinCounts.length);
+//            this.maxMuBinAbsoluteDeviation = maxMuBinAbsoluteDeviation;
+//            this.maxMuBinRelativeDeviation = maxMuBinRelativeDeviation;
         }
     }
 }
