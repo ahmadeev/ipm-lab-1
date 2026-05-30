@@ -10,6 +10,8 @@ import java.util.List;
 public class CosineSphereDirections {
     private static final double EPSILON = 1e-6;
     private static final int MU_BIN_COUNT = 10;
+    private static final int THETA_RING_STEP_DEGREES = 15;
+    private static final int THETA_RING_COUNT = 90 / THETA_RING_STEP_DEGREES;
 
     private final Vec3 sphereCenter;
     private final Vec3 sphereNormal;
@@ -63,6 +65,7 @@ public class CosineSphereDirections {
         double sumY = 0.0;
         double sumZ = 0.0;
         int[] rhoBinCounts = new int[MU_BIN_COUNT];
+        int[] thetaRingCounts = new int[THETA_RING_COUNT];
 //        int[] muBinCounts = new int[MU_BIN_COUNT];
 
         for (Vec3 direction : directions) {
@@ -90,6 +93,13 @@ public class CosineSphereDirections {
             int rhoBinIndex = mapUnitIntervalToBinIndex(rho);
             rhoBinCounts[rhoBinIndex]++;
 
+            double thetaDegrees = Math.toDegrees(Math.acos(Utils.clamp(mu, 0.0, 1.0)));
+            int thetaRingIndex = (int) (thetaDegrees / THETA_RING_STEP_DEGREES);
+            if (thetaRingIndex == THETA_RING_COUNT) {
+                thetaRingIndex = THETA_RING_COUNT - 1;
+            }
+            thetaRingCounts[thetaRingIndex]++;
+
 //            int muBinIndex = mapUnitIntervalToBinIndex(Utils.clamp(mu, 0.0, 1.0));
 //            muBinCounts[muBinIndex]++;
         }
@@ -104,6 +114,28 @@ public class CosineSphereDirections {
 
             maxRhoBinAbsoluteDeviation = Math.max(maxRhoBinAbsoluteDeviation, absoluteDeviation);
             maxRhoBinRelativeDeviation = Math.max(maxRhoBinRelativeDeviation, relativeDeviation);
+        }
+
+        double[] thetaRingAreas = new double[THETA_RING_COUNT];
+        double[] thetaRingDensities = new double[THETA_RING_COUNT];
+        double[] expectedThetaRingRelativeDensities = new double[THETA_RING_COUNT];
+        double baseExpectedThetaRingDensity = 0.0;
+
+        for (int i = 0; i < THETA_RING_COUNT; i++) {
+            double thetaStart = Math.toRadians(i * THETA_RING_STEP_DEGREES);
+            double thetaEnd = Math.toRadians((i + 1) * THETA_RING_STEP_DEGREES);
+            double cosStart = Math.cos(thetaStart);
+            double cosEnd = Math.cos(thetaEnd);
+
+            thetaRingAreas[i] = 2.0 * Math.PI * (cosStart - cosEnd);
+            thetaRingDensities[i] = thetaRingCounts[i] / thetaRingAreas[i];
+
+            double expectedDensity = (cosStart + cosEnd) / 2.0;
+            if (i == 0) {
+                baseExpectedThetaRingDensity = expectedDensity;
+            }
+
+            expectedThetaRingRelativeDensities[i] = expectedDensity / baseExpectedThetaRingDensity;
         }
 
 //        double[] expectedMuBinCounts = new double[MU_BIN_COUNT];
@@ -135,7 +167,11 @@ public class CosineSphereDirections {
                 rhoBinCounts,
                 expectedRhoBinCount,
                 maxRhoBinAbsoluteDeviation,
-                maxRhoBinRelativeDeviation
+                maxRhoBinRelativeDeviation,
+                thetaRingCounts,
+                thetaRingAreas,
+                thetaRingDensities,
+                expectedThetaRingRelativeDensities
         );
     }
 
@@ -168,6 +204,23 @@ public class CosineSphereDirections {
         //System.out.printf("Фактические числа по rho-бинам: %s%n", Arrays.toString(validation.rhoBinCounts));
         //System.out.printf("Макс. абсолютное отклонение по rho-бинам: %.2f%n", validation.maxRhoBinAbsoluteDeviation);
         //System.out.printf("Макс. относительное отклонение по rho-бинам: %.6f%n", validation.maxRhoBinRelativeDeviation);
+        System.out.println("Плотность по сферическим кольцам:");
+        for (int i = 0; i < THETA_RING_COUNT; i++) {
+            double thetaStart = i * THETA_RING_STEP_DEGREES;
+            double thetaEnd = (i + 1) * THETA_RING_STEP_DEGREES;
+            double relativeDensity = validation.thetaRingDensities[i] / validation.thetaRingDensities[0];
+
+            System.out.printf(
+                    "%.0f-%.0f°: count=%d, area=%.6f, density=%.6f, relative=%.6f, expectedRelative=%.6f%n",
+                    thetaStart,
+                    thetaEnd,
+                    validation.thetaRingCounts[i],
+                    validation.thetaRingAreas[i],
+                    validation.thetaRingDensities[i],
+                    relativeDensity,
+                    validation.expectedThetaRingRelativeDensities[i]
+            );
+        }
 //        System.out.printf("Ожидаемые числа по mu-бинам: %s%n", formatDoubleArray(validation.expectedMuBinCounts));
 //        System.out.printf("Фактические числа по mu-бинам: %s%n", Arrays.toString(validation.muBinCounts));
 //        System.out.printf("Макс. абсолютное отклонение по mu-бинам: %.2f%n", validation.maxMuBinAbsoluteDeviation);
@@ -240,6 +293,10 @@ public class CosineSphereDirections {
         private final double expectedRhoBinCount;
         private final double maxRhoBinAbsoluteDeviation;
         private final double maxRhoBinRelativeDeviation;
+        private final int[] thetaRingCounts;
+        private final double[] thetaRingAreas;
+        private final double[] thetaRingDensities;
+        private final double[] expectedThetaRingRelativeDensities;
 //        private final int[] muBinCounts;
 //        private final double[] expectedMuBinCounts;
 //        private final double maxMuBinAbsoluteDeviation;
@@ -254,7 +311,11 @@ public class CosineSphereDirections {
                 int[] rhoBinCounts,
                 double expectedRhoBinCount,
                 double maxRhoBinAbsoluteDeviation,
-                double maxRhoBinRelativeDeviation
+                double maxRhoBinRelativeDeviation,
+                int[] thetaRingCounts,
+                double[] thetaRingAreas,
+                double[] thetaRingDensities,
+                double[] expectedThetaRingRelativeDensities
         ) {
             this.directionsOffUnitSphere = directionsOffUnitSphere;
             this.directionsBelowHemisphere = directionsBelowHemisphere;
@@ -265,6 +326,11 @@ public class CosineSphereDirections {
             this.expectedRhoBinCount = expectedRhoBinCount;
             this.maxRhoBinAbsoluteDeviation = maxRhoBinAbsoluteDeviation;
             this.maxRhoBinRelativeDeviation = maxRhoBinRelativeDeviation;
+            this.thetaRingCounts = Arrays.copyOf(thetaRingCounts, thetaRingCounts.length);
+            this.thetaRingAreas = Arrays.copyOf(thetaRingAreas, thetaRingAreas.length);
+            this.thetaRingDensities = Arrays.copyOf(thetaRingDensities, thetaRingDensities.length);
+            this.expectedThetaRingRelativeDensities =
+                    Arrays.copyOf(expectedThetaRingRelativeDensities, expectedThetaRingRelativeDensities.length);
 //            this.muBinCounts = Arrays.copyOf(muBinCounts, muBinCounts.length);
 //            this.expectedMuBinCounts = Arrays.copyOf(expectedMuBinCounts, expectedMuBinCounts.length);
 //            this.maxMuBinAbsoluteDeviation = maxMuBinAbsoluteDeviation;
