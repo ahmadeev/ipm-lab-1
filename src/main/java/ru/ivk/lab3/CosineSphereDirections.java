@@ -164,10 +164,10 @@ public class CosineSphereDirections {
         System.out.printf("Макс. отклонение длины: %.12f%n", validation.maxLengthDeviation);
         System.out.printf("Мин. dot(dir, N): %.12f%n", validation.minDotWithNormal);
         System.out.printf("Средняя длина результирующего вектора: %.12f%n", validation.meanResultantLength);
-        System.out.printf("Ожидаемое число в каждом rho-бине: %.2f%n", validation.expectedRhoBinCount);
-        System.out.printf("Фактические числа по rho-бинам: %s%n", Arrays.toString(validation.rhoBinCounts));
-        System.out.printf("Макс. абсолютное отклонение по rho-бинам: %.2f%n", validation.maxRhoBinAbsoluteDeviation);
-        System.out.printf("Макс. относительное отклонение по rho-бинам: %.6f%n", validation.maxRhoBinRelativeDeviation);
+        //System.out.printf("Ожидаемое число в каждом rho-бине: %.2f%n", validation.expectedRhoBinCount);
+        //System.out.printf("Фактические числа по rho-бинам: %s%n", Arrays.toString(validation.rhoBinCounts));
+        //System.out.printf("Макс. абсолютное отклонение по rho-бинам: %.2f%n", validation.maxRhoBinAbsoluteDeviation);
+        //System.out.printf("Макс. относительное отклонение по rho-бинам: %.6f%n", validation.maxRhoBinRelativeDeviation);
 //        System.out.printf("Ожидаемые числа по mu-бинам: %s%n", formatDoubleArray(validation.expectedMuBinCounts));
 //        System.out.printf("Фактические числа по mu-бинам: %s%n", Arrays.toString(validation.muBinCounts));
 //        System.out.printf("Макс. абсолютное отклонение по mu-бинам: %.2f%n", validation.maxMuBinAbsoluteDeviation);

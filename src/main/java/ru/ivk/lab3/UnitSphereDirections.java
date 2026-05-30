@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 public class UnitSphereDirections {
-    private static final Random random = new Random(123456L);
+    private static final Random random = new Random(1);
     private static final double EPSILON = 1e-6;
     private static final int MU_BIN_COUNT = 10;
 

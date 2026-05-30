@@ -11,7 +11,7 @@ import java.util.Random;
 public class PlaneTriangle {
     private static final Random random = new Random(123456L);
     private static final double EPSILON = 1e-6;
-    private static final int TRIANGLE_GRID_SUBDIVISION_COUNT = 10;
+    private static final int TRIANGLE_GRID_SUBDIVISION_COUNT = 2;
 
     private final Vec3 vertex1;
     private final Vec3 vertex2;
