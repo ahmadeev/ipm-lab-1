@@ -11,6 +11,17 @@ import java.util.Objects;
  * Билатеральный фильтр вторичной яркости синтезированного изображения.
  */
 public final class BilateralFilter {
+    /*
+        p -- сама точка изображения
+        g(p) -- новая яркость
+        S -- некоторая квадратная область
+        q -- точка изображения из области S
+        f(q) -- старая яркость
+        G_s(p, q) -- вес по пространству
+        G_r(p, q) -- вес по яркости
+        W_p -- сумма произведений весов по всем соседям
+     */
+
     private static final double MIN_WEIGHT_SUM = 1e-12;
 
     private final BilateralFilterSettings settings;
@@ -133,6 +144,7 @@ public final class BilateralFilter {
         return gaussian(dr * dr + dg * dg + db * db, settings.getSigmaColor());
     }
 
+    // sigma растет, вклад веса растет
     private double gaussian(double squaredDistance, double sigma) {
         return Math.exp(-squaredDistance / (2.0 * sigma * sigma));
     }
