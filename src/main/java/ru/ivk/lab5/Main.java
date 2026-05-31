@@ -9,6 +9,7 @@ import ru.ivk.lab4.scene.DemoSceneFactory;
 import ru.ivk.lab4.scene.RenderJob;
 import ru.ivk.lab5.filter.BilateralFilter;
 import ru.ivk.lab5.filter.BilateralFilterSettings;
+import ru.ivk.lab5.image.BrightnessStats;
 import ru.ivk.lab5.image.RenderDataImages;
 
 import java.io.IOException;
@@ -47,6 +48,8 @@ public class Main {
         long filterStart = System.nanoTime();
         RenderDataBuffer filtered = filter.apply(noisy);
         long filterElapsedNanos = System.nanoTime() - filterStart;
+        BrightnessStats noisyBrightness = BrightnessStats.from(noisy);
+        BrightnessStats filteredBrightness = BrightnessStats.from(filtered);
 
         write(RenderDataImages.total(noisy), settings, "noisy");
         write(RenderDataImages.total(filtered), settings, "filtered");
@@ -56,7 +59,29 @@ public class Main {
 
         System.out.printf("Render time: %.3f s%n", renderElapsedNanos / 1_000_000_000.0);
         System.out.printf("Filter time: %.3f s%n", filterElapsedNanos / 1_000_000_000.0);
+        printBrightnessComparison(noisyBrightness, filteredBrightness);
         System.out.printf("Saved images to: %s%n", OUTPUT_DIR);
+    }
+
+    private static void printBrightnessComparison(BrightnessStats before, BrightnessStats after) {
+        System.out.println("Brightness check:");
+        printBrightnessRow("direct", before.getDirect(), after.getDirect());
+        printBrightnessRow("indirect", before.getIndirect(), after.getIndirect());
+        printBrightnessRow("total", before.getTotal(), after.getTotal());
+    }
+
+    private static void printBrightnessRow(String name, double before, double after) {
+        double delta = after - before;
+        double relative = before == 0.0 ? 0.0 : delta / before;
+
+        System.out.printf(
+                "  %s: before=%.9f, after=%.9f, delta=%+.9f, relative=%+.6f%%%n",
+                name,
+                before,
+                after,
+                delta,
+                relative * 100.0
+        );
     }
 
     private static void write(ImageBuffer image, RenderSettings baseSettings, String name) throws IOException {
