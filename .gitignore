@@ -1,7 +1,4 @@
-helpers/references/
-helpers/output/
-helpers/plans/
-helpers/memory/
+helpers/
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
