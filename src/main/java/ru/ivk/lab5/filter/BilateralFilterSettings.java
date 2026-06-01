@@ -11,7 +11,7 @@ public final class BilateralFilterSettings {
     private final double sigmaSpace;
     private final double sigmaDepth;
     private final double sigmaColor;
-    private final double normalPower;
+    private final double sigmaNormal;
     private final boolean useColorWeight;
 
     public BilateralFilterSettings(
@@ -19,7 +19,7 @@ public final class BilateralFilterSettings {
             double sigmaSpace,
             double sigmaDepth,
             double sigmaColor,
-            double normalPower,
+            double sigmaNormal,
             boolean useColorWeight
     ) {
         if (radius < 0) {
@@ -38,15 +38,15 @@ public final class BilateralFilterSettings {
             throw new IllegalArgumentException("color sigma must be positive");
         }
 
-        if (normalPower < 0.0) {
-            throw new IllegalArgumentException("normal power must be non-negative");
+        if (sigmaNormal <= 0.0) {
+            throw new IllegalArgumentException("normal sigma must be positive");
         }
 
         this.radius = radius;
         this.sigmaSpace = sigmaSpace;
         this.sigmaDepth = sigmaDepth;
         this.sigmaColor = sigmaColor;
-        this.normalPower = normalPower;
+        this.sigmaNormal = sigmaNormal;
         this.useColorWeight = useColorWeight;
     }
 
@@ -56,7 +56,7 @@ public final class BilateralFilterSettings {
                 2.0,
                 0.35,
                 0.5,
-                16.0,
+                0.35,
                 true
         );
     }

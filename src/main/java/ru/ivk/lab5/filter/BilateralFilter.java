@@ -125,9 +125,9 @@ public final class BilateralFilter {
     private double normalWeight(PixelRenderData center, PixelRenderData neighbor) {
         Vec3 centerNormal = center.getNormal();
         Vec3 neighborNormal = neighbor.getNormal();
-        double similarity = Math.max(0.0, centerNormal.dot(neighborNormal));
+        Vec3 difference = centerNormal.sub(neighborNormal);
 
-        return Math.pow(similarity, settings.getNormalPower());
+        return gaussian(difference.dot(difference), settings.getSigmaNormal());
     }
 
     private double colorWeight(PixelRenderData center, PixelRenderData neighbor) {
